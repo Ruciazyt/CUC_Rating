@@ -44,7 +44,7 @@ import {
   Divider,
   Icon,
 } from "vant";
-import { nextTick, onMounted, ref } from "vue";
+import { ref } from "vue";
 import FormItem from "./components/FormItem.vue";
 import { useRouter, useRoute } from "vue-router";
 export default {
@@ -73,19 +73,25 @@ export default {
       }
     };
     const getTargets = () => {
-      rateTargets.value = [
-        { name: "研究生院", id: 1 },
-        { name: "教务处", id: 2 },
-        { name: "教务处3", id: 3 },
-        { name: "教务处4", id: 4 },
-        { name: "教务处5", id: 5 },
-        { name: "教务处6", id: 6 },
-        { name: "教务处7", id: 7 },
-        { name: "教务处8", id: 8 },
-        { name: "教务处9", id: 9 },
-        { name: "教务处10", id: 10 },
-      ];
+      new Promise((resolve) => {
+        rateTargets.value = [
+          { name: "研究生院", id: 1 },
+          { name: "教务处", id: 2 },
+          { name: "教务处3", id: 3 },
+          { name: "教务处4", id: 4 },
+          { name: "教务处5", id: 5 },
+          { name: "教务处6", id: 6 },
+          { name: "教务处7", id: 7 },
+          { name: "教务处8", id: 8 },
+          { name: "教务处9", id: 9 },
+          { name: "教务处10", id: 10 },
+        ];
+        resolve();
+      }).then(() => {
+        jumpToId()
+      });
     };
+
     getTargets();
     const totalScoreClick = () => {
       router.push({
@@ -95,7 +101,7 @@ export default {
 
     const jumpToId = () => {
       if (route.query && route.query.id) {
-        console.log(route.query.id);
+        // console.log(route.query.id);
         // 首先找到当前id的元素在数组中的位置
         const location = rateTargets.value.findIndex(
           (element) => element.id == route.query.id
@@ -104,6 +110,7 @@ export default {
           // 根据location获取ref， 取得对应的DOM
           const el = refArr[location];
           const offsetTop = el.$el.offsetTop;
+          // console.log(el.$el);
           const htmlDom = document.documentElement;
           htmlDom.scrollTo(0, offsetTop);
         }
@@ -111,7 +118,6 @@ export default {
         console.log(route);
       }
     };
-    onMounted(() => jumpToId());
     return {
       themeVars,
       rateTargets,
