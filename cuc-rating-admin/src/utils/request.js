@@ -120,4 +120,16 @@ export const postRequest = (url, params) => {
   });
 };
 
+
+export const deleteRequest = (url, params) => {
+  return axios({
+    method: "delete",
+    url: process.env.VUE_APP_BASE_API + `${url}`,
+    params: params,
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded",
+    },
+  });
+};
+
 export default service;

@@ -11,3 +11,7 @@ export function createQS(params) {
 export function getTokens(params) {
   return getRequest('/tokens', params)
 }
+
+export function getProgress(params) {
+  return getRequest('/progress', params)
+}

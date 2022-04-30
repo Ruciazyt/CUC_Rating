@@ -1,30 +1,141 @@
 <template>
-  <div class="dashboard-container">
-    <div class="dashboard-text">name: {{ name }}</div>
+  <div>
+    <aside>
+      现有部门
+      <el-button
+        type="text"
+        icon="el-icon-plus"
+        @click="handleAddClick"
+      ></el-button>
+    </aside>
+    <el-card class="deptCard">
+      <el-tag
+        v-for="tag in deptsList"
+        :key="tag.id"
+        class="deptTag"
+        closable
+        @close="handleClose(tag.name)"
+      >
+        {{ tag.name }}
+      </el-tag>
+    </el-card>
+    <el-dialog title="新增目标" :visible.sync="dialogFormVisible">
+      <el-form :model="form">
+        <el-form-item label="部门名称">
+          <el-input v-model="form.name" autocomplete="off"></el-input>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="dialogFormVisible = false">取 消</el-button>
+        <el-button type="primary" @click="handleSubmit()">确 定</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
-
+import { getAllDepts, deleteDept, addDept } from "@/api/dept";
 export default {
-  name: 'Dashboard',
-  computed: {
-    ...mapGetters([
-      'name'
-    ])
-  }
-}
+  name: "Dashboard",
+  data() {
+    return {
+      deptsList: [],
+      dialogFormVisible: false,
+      form: {
+        name: "",
+      },
+    };
+  },
+  created() {
+    this.getAllDepts();
+  },
+  methods: {
+    getAllDepts() {
+      getAllDepts().then((resp) => {
+        const resArr = resp.data;
+        if (resArr instanceof Array && resArr.length > 0) {
+          this.deptsList = resArr.map((item, index) => {
+            return {
+              id: index,
+              name: item,
+            };
+          });
+        }
+      });
+    },
+    handleSubmit() {
+      const condition = Object.assign({}, this.form);
+      addDept(condition).then((resp) => {
+        console.log(resp);
+        if (resp.status == 200) {
+          this.$notify({
+            title: "成功",
+            message: "添加成功",
+            type: "success",
+          });
+        }else{
+          this.$notify.error({
+            title: "错误",
+            message: "添加失败"
+          });
+        }
+        this.dialogFormVisible = false;
+        this.getAllDepts()
+      });
+    },
+    handleAddClick() {
+      this.dialogFormVisible = true;
+    },
+    handleClose(tagName) {
+      this.$confirm("此操作将永久删除该文件, 是否继续?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning",
+      })
+        .then(() => {
+          const condition = {
+            name: tagName,
+          };
+          deleteDept(condition).then((resp) => {
+            if (resp.status == 200) {
+              this.$message({
+                type: "success",
+                message: "删除成功!",
+              });
+              this.getAllDepts()
+            }
+          });
+        })
+        .catch(() => {
+          this.$message({
+            type: "info",
+            message: "已取消删除",
+          });
+        });
+    },
+  },
+};
 </script>
 
 <style lang="scss" scoped>
-.dashboard {
-  &-container {
-    margin: 30px;
-  }
-  &-text {
-    font-size: 30px;
-    line-height: 46px;
-  }
+aside {
+  background: #eef1f6;
+  padding: 8px 24px;
+  margin: 20px;
+  border-radius: 2px;
+  display: block;
+  line-height: 32px;
+  font-size: 16px;
+  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
+    Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
+  color: #2c3e50;
+  -webkit-font-smoothing: antialiased;
+}
+.deptCard {
+  margin: 20px;
+}
+
+.deptTag {
+  margin: 0 0 0 10px;
 }
 </style>

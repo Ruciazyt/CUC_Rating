@@ -33,12 +33,15 @@
       style="float: right; padding: 32px 16px"
     >
     </el-pagination>
+    <score-list ref="scoreList" :list="progressList"></score-list>
   </el-card>
 </template>
 
 <script>
-import { getTokens } from "@/api/qs";
+import { getTokens, getProgress } from "@/api/qs";
+import ScoreList from './components/ScoreList.vue'
 export default {
+  components: { ScoreList },
   data() {
     return {
       list: [],
@@ -47,6 +50,7 @@ export default {
       currentPage: 1,
       pageSize: 10,
       timeStr: "",
+      progressList: []
     };
   },
   created() {
@@ -72,6 +76,18 @@ export default {
         this.listLoading = false;
       });
     },
+
+    handleClick(rowData){
+      const [timeStr, tokenId] = [this.timeStr, rowData.tokenId];
+      const condition = {
+        time_string: timeStr,
+        token: tokenId,
+      }
+      getProgress(condition).then((resp) => {
+        this.progressList = resp.data;
+      })
+      this.$refs.scoreList.dialogVisible = true;
+    }
   },
 };
 </script>
