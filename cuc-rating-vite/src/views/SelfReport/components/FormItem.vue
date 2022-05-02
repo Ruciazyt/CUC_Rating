@@ -63,7 +63,6 @@ export default {
     rateItem: Object,
   },
   setup(props) {
-    console.log(props.rateItem);
     const checked = ref("1");
     const valueRange = reactive({
       currentValue: props.rateItem.score === "-1" ? 0 : props.rateItem.score,

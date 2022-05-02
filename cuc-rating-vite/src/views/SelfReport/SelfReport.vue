@@ -79,7 +79,6 @@ export default {
         token: "Eyj2ni",
       };
       getAllTarget(condition).then((resp) => {
-        console.log(resp);
         rateTargets.value = resp.data;
         jumpToId();
       });
@@ -108,7 +107,7 @@ export default {
           htmlDom.scrollTo(0, offsetTop);
         }
       } else {
-        console.log(route);
+        // console.log(route);
       }
     };
     return {

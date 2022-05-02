@@ -1,24 +1,26 @@
 <template>
   <div>
-    <van-nav-bar
-      title="总分"
-      left-text="返回"
-      left-arrow
-      @click-left="onClickLeft"
-    />
+    <div>
+      <van-nav-bar
+        title="总分"
+        left-text="返回"
+        left-arrow
+        @click-left="onClickLeft"
+      />
+    </div>
+    <ul>
+      <li
+        v-for="item in scoreList"
+        :key="item.id"
+        class="scoreItem"
+        @click="onClickJumpToId(item.id)"
+      >
+        <span class="itemId"> {{ item.id }} </span>
+        <span class="itemName"> {{ item.name }}</span>
+        <span class="itemScore"> {{ item.score }}</span>
+      </li>
+    </ul>
   </div>
-  <ul>
-    <li
-      v-for="item in scoreList"
-      :key="item.id"
-      class="scoreItem"
-      @click="onClickJumpToId(item.id)"
-    >
-      <span class="itemId"> {{ item.id }} </span>
-      <span class="itemName"> {{ item.name }}</span>
-      <span class="itemScore"> {{ item.score }}</span>
-    </li>
-  </ul>
 </template>
 
 <script>
@@ -47,22 +49,22 @@ export default {
         state.scoreList = resp.data;
       });
     };
-    
+
     getScoreList();
 
     const onClickLeft = () => history.back();
     const onClickJumpToId = (id) => {
       router.push({
-         path: "/",
-         query:{
-           id:id
-         }
-      })
+        path: "/",
+        query: {
+          id: id,
+        },
+      });
     };
     return {
       ...toRefs(state),
       onClickLeft,
-      onClickJumpToId
+      onClickJumpToId,
     };
   },
 };
