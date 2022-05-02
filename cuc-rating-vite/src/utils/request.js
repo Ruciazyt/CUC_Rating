@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const service = axios.create({
-    // baseURL:'/',
+    // baseURL: process.env.VUE_APP_BASE_API,
     timeout: 1000000
 })
 
@@ -22,5 +22,40 @@ axios.interceptors.response.use(response => {
     this.$message.error("失败")
     return Promise.reject(error)
 })
+
+
+export const getRequest = (url, params) => {
+    return axios({
+      method: "GET",
+      url: '/dev-api' + `${url}`,
+      params: params,
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+    });
+  };
+  
+  export const postRequest = (url, params) => {
+    return axios({
+      method: "POST",
+      url: '/dev-api' + `${url}`,
+      params: params,
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+    });
+  };
+  
+  
+  export const deleteRequest = (url, params) => {
+    return axios({
+      method: "delete",
+      url: '/dev-api' + `${url}`,
+      params: params,
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+    });
+  };
 
 export default service

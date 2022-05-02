@@ -93,16 +93,6 @@ export const getRequest = (url, params) => {
     method: "GET",
     url: process.env.VUE_APP_BASE_API + `${url}`,
     params: params,
-    // transformRequest: [
-    //   function (data) {
-    //     let ret = "";
-    //     for (const it in data) {
-    //       ret +=
-    //         encodeURIComponent(it) + "=" + encodeURIComponent(data[it]) + "&";
-    //     }
-    //     return ret;
-    //   },
-    // ],
     headers: {
       "Content-Type": "application/x-www-form-urlencoded",
     },

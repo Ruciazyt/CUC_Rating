@@ -2,11 +2,12 @@
   <div>
     <van-row justify="space-between" style="margin-bottom: 1%">
       <van-col span="8"
-        ><span style="font-weight: bold">{{ rateTarget }}</span></van-col
+        ><span style="font-weight: bold">{{ rateItem.name }}</span></van-col
       >
       <van-col span="8" offset="8">
         <van-stepper
           v-model="valueRange.currentValue"
+          @change="handleStepperChange"
           :min="valueRange.min"
           :max="valueRange.max"
         />
@@ -40,8 +41,10 @@ import {
   Col,
   Stepper,
   Divider,
+  Notify,
 } from "vant";
 import { reactive, ref } from "vue";
+import { rate } from "@/apis/reportForm";
 export default {
   name: "FormItem",
   components: {
@@ -54,14 +57,16 @@ export default {
     [Row.name]: Row,
     [Stepper.name]: Stepper,
     [Divider.name]: Divider,
+    [Notify.Component.name]: Notify.Component,
   },
   props: {
-    rateTarget: String,
+    rateItem: Object,
   },
   setup(props) {
+    console.log(props.rateItem);
     const checked = ref("1");
     const valueRange = reactive({
-      currentValue: 90,
+      currentValue: props.rateItem.score === "-1" ? 0 : props.rateItem.score,
       min: 0,
       max: 100,
     });
@@ -93,7 +98,32 @@ export default {
       valueRange.max = max;
       valueRange.min = min;
     };
-    return { checked, valueRange, handleCheckedChange };
+
+    // 防抖函数 - 控制多次触发只执行一次
+    const debounce = (fn, delay) => {
+      let timer;
+      return function () {
+        if (timer) clearTimeout(timer);
+        timer = setTimeout(() => {
+          fn();
+        }, delay);
+      };
+    };
+    const handleStepperChange = debounce(() => {
+      const condition = {
+        time_string: "2022-04-27_07:40:26",
+        token: "Eyj2ni",
+        id: props.rateItem.id,
+        score: valueRange.currentValue,
+      };
+      rate(condition).then((resp) => {
+        if (resp.status == 200) {
+          Notify({ type: 'success', message: '自动保存成功' });
+        }
+      });
+    }, 2000);
+
+    return { checked, valueRange, handleCheckedChange, handleStepperChange };
   },
 };
 </script>

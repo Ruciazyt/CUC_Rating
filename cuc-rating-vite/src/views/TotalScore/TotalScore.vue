@@ -25,6 +25,7 @@
 import { NavBar, List, Cell } from "vant";
 import { ref, reactive, toRefs } from "vue";
 import { useRouter } from "vue-router";
+import { getAllTarget } from "@/apis/reportForm.js";
 export default {
   components: {
     [NavBar.name]: NavBar,
@@ -36,26 +37,17 @@ export default {
       scoreList: [],
     });
     const router = useRouter();
-    const getScoreList = () => {
-      // const conditions = {}
 
-      // getScoreList(conditions).then(resp => {
-      //   const {data} = resp
-      //   state.scoreList = data.data
-      // })
-      setTimeout(() => {
-        const data = [];
-        for (let i = 0; i < 20; i++) {
-          data.push({
-            id: i,
-            name: "招生处",
-            score: Math.round(Math.random() * 100),
-          });
-        }
-        state.scoreList = data;
+    const getScoreList = () => {
+      const condition = {
+        time_string: "2022-04-27_07:40:26",
+        token: "Eyj2ni",
+      };
+      getAllTarget(condition).then((resp) => {
+        state.scoreList = resp.data;
       });
     };
-
+    
     getScoreList();
 
     const onClickLeft = () => history.back();

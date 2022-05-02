@@ -26,7 +26,7 @@
     <FormItem
       v-for="item in rateTargets"
       :key="item.id"
-      :rateTarget="item.name"
+      :rateItem="item"
       :ref="setRef"
       class="FormItem"
     />
@@ -47,6 +47,7 @@ import {
 import { ref } from "vue";
 import FormItem from "./components/FormItem.vue";
 import { useRouter, useRoute } from "vue-router";
+import { getAllTarget } from "@/apis/reportForm.js";
 export default {
   components: {
     FormItem,
@@ -73,22 +74,14 @@ export default {
       }
     };
     const getTargets = () => {
-      new Promise((resolve) => {
-        rateTargets.value = [
-          { name: "研究生院", id: 1 },
-          { name: "教务处", id: 2 },
-          { name: "教务处3", id: 3 },
-          { name: "教务处4", id: 4 },
-          { name: "教务处5", id: 5 },
-          { name: "教务处6", id: 6 },
-          { name: "教务处7", id: 7 },
-          { name: "教务处8", id: 8 },
-          { name: "教务处9", id: 9 },
-          { name: "教务处10", id: 10 },
-        ];
-        resolve();
-      }).then(() => {
-        jumpToId()
+      const condition = {
+        time_string: "2022-04-27_07:40:26",
+        token: "Eyj2ni",
+      };
+      getAllTarget(condition).then((resp) => {
+        console.log(resp);
+        rateTargets.value = resp.data;
+        jumpToId();
       });
     };
 
