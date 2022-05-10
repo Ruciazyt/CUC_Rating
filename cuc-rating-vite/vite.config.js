@@ -15,6 +15,11 @@ export default defineConfig({
       resolves: [VantResolve()],
     }),
   ],
+  build:{
+    target:'modules',
+    outDir:'dist',
+    assetsDir:'assets'
+  },
   server: {
     host: "0.0.0.0",
     proxy: {
