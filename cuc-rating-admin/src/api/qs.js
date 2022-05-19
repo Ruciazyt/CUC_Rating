@@ -1,4 +1,4 @@
-import {getRequest,postRequest} from '@/utils/request'
+import {getRequest,postRequest,fileDownloadRequest} from '@/utils/request'
 
 export function getAllQS() {
   return getRequest('/questionnaires')
@@ -14,4 +14,8 @@ export function getTokens(params) {
 
 export function getProgress(params) {
   return getRequest('/progress', params)
+}
+
+export function exportDoc(params) {
+  return fileDownloadRequest('/documents', params)
 }

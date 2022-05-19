@@ -110,7 +110,6 @@ export const postRequest = (url, params) => {
   });
 };
 
-
 export const deleteRequest = (url, params) => {
   return axios({
     method: "delete",
@@ -122,4 +121,15 @@ export const deleteRequest = (url, params) => {
   });
 };
 
+export const fileDownloadRequest = (url, params) => {
+  return axios({
+    method: "get",
+    url: process.env.VUE_APP_BASE_API + `${url}`,
+    params: params,
+    responseType: "blob",
+    headers: {
+      "Content-Type": "application/json;charset=utf-8",
+    },
+  });
+};
 export default service;

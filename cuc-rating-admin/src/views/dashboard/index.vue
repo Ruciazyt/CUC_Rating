@@ -7,11 +7,25 @@
         icon="el-icon-plus"
         @click="handleAddClick"
       ></el-button>
+
     </aside>
+    <p class="deptTypeTitle">教学教研单位</p>
     <el-card class="deptCard">
       <el-tag
-        v-for="tag in deptsList"
-        :key="tag.id"
+        v-for="tag in deptsList_JY"
+        :key="tag.name"
+        class="deptTag"
+        closable
+        @close="handleClose(tag.name)"
+      >
+        {{ tag.name }}
+      </el-tag>
+    </el-card>
+    <p class="deptTypeTitle">党群行政职能部门</p>
+    <el-card class="deptCard">
+      <el-tag
+        v-for="tag in deptsList_DQ"
+        :key="tag.name"
         class="deptTag"
         closable
         @close="handleClose(tag.name)"
@@ -23,6 +37,17 @@
       <el-form :model="form">
         <el-form-item label="部门名称">
           <el-input v-model="form.name" autocomplete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="部门类型">
+          <el-select v-model="form.type" autocomplete="off">
+            <el-option
+              v-for="option in deptTypes"
+              :label="option.label"
+              :key="option.id"
+              :value="option.id"
+            >
+            </el-option>
+          </el-select>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -39,11 +64,24 @@ export default {
   name: "Dashboard",
   data() {
     return {
-      deptsList: [],
+      deptsList_JY: [],
+      deptsList_DQ: [],
       dialogFormVisible: false,
       form: {
         name: "",
+        type: 0,
       },
+      //type=0为教学教研单位  type=1为党群行政职能部门
+      deptTypes: [
+        {
+          id: 0,
+          label: "教学教研单位",
+        },
+        {
+          id: 1,
+          label: "党群行政职能部门",
+        },
+      ],
     };
   },
   created() {
@@ -52,15 +90,24 @@ export default {
   methods: {
     getAllDepts() {
       getAllDepts().then((resp) => {
-        const resArr = resp.data;
-        if (resArr instanceof Array && resArr.length > 0) {
-          this.deptsList = resArr.map((item, index) => {
-            return {
-              id: index,
-              name: item,
-            };
-          });
-        }
+        const resObj = resp.data;
+        const JY_depts = [];
+        const DQ_depts = [];
+        Object.keys(resObj).forEach((key) => {
+          if (resObj[key] == 0) {
+            JY_depts.push({
+              id: resObj[key],
+              name: key,
+            });
+          } else if (resObj[key] == 1) {
+            DQ_depts.push({
+              id: resObj[key],
+              name: key,
+            });
+          }
+          this.deptsList_JY = JY_depts;
+          this.deptsList_DQ = DQ_depts;
+        });
       });
     },
     handleSubmit() {
@@ -73,21 +120,21 @@ export default {
             message: "添加成功",
             type: "success",
           });
-        }else{
+        } else {
           this.$notify.error({
             title: "错误",
-            message: "添加失败"
+            message: "添加失败",
           });
         }
         this.dialogFormVisible = false;
-        this.getAllDepts()
+        this.getAllDepts();
       });
     },
     handleAddClick() {
       this.dialogFormVisible = true;
     },
     handleClose(tagName) {
-      this.$confirm("此操作将永久删除该文件, 是否继续?", "提示", {
+      this.$confirm("此操作将永久删除, 是否继续?", "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
         type: "warning",
@@ -102,7 +149,7 @@ export default {
                 type: "success",
                 message: "删除成功!",
               });
-              this.getAllDepts()
+              this.getAllDepts();
             }
           });
         })
@@ -137,5 +184,13 @@ aside {
 
 .deptTag {
   margin: 0 0 0 10px;
+}
+
+.deptTypeTitle {
+  margin-left: 30px;
+  font-size: 18px;
+  font-weight: 500;
+  font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "微软雅黑",
+    Arial, sans-serif;
 }
 </style>

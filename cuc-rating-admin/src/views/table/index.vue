@@ -16,12 +16,9 @@
       <el-table-column fixed="right" label="操作" width="200">
         <template slot-scope="scope">
           <router-link :to="'/question/tokenList/' + scope.row.createTime">
-            <el-button
-              type="success"
-              size="small"
-              >查看</el-button
-            >
+            <el-button type="success" size="small">查看</el-button>
           </router-link>
+           <el-button type='primary' size='small' @click="handleExportDoc(scope.row.createTime)" style="margin-left:10px">导出文档</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -41,7 +38,7 @@
 </template>
 
 <script>
-import { getAllQS } from "@/api/qs";
+import { getAllQS, exportDoc } from "@/api/qs";
 import ScoreForm from "./components/ScoreForm.vue";
 export default {
   components: { ScoreForm },
@@ -80,6 +77,22 @@ export default {
     handleSuccess() {
       this.fetchData();
     },
+    handleExportDoc(timeStr){
+      const condition = {
+        time_string:timeStr
+      }
+      const fileName = timeStr + "导出文档"
+      exportDoc(condition).then(response=>{
+        let blob = new Blob([response.data], { type: 'application/zip' })
+        // 非IE下载
+        let a = document.createElement('a')
+        a.style.display = 'none'
+        a.href = window.URL.createObjectURL(blob)
+        a.download = fileName
+        a.click()
+        URL.revokeObjectURL(a.href) // 释放URL 对象
+      })
+    }
   },
 };
 </script>

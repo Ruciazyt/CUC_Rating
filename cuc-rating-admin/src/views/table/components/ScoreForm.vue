@@ -5,11 +5,11 @@
       label-width="80px"
       :model="formInfo"
     >
-      <el-form-item label="问卷生成份数">
-        <el-input v-model="formInfo.token_num"></el-input>
+      <el-form-item label="线上打分团每组数量">
+        <el-input v-model="formInfo.online_num"></el-input>
       </el-form-item>
-      <el-form-item label="最少填写份数">
-        <el-input v-model="formInfo.min_num"></el-input>
+      <el-form-item label="评委组每组数量">
+        <el-input v-model="formInfo.offline_num"></el-input>
       </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="onSubmit">立即创建</el-button>
@@ -27,8 +27,8 @@ export default {
     return {
       labelPosition: "right",
       formInfo: {
-        token_num: 4,
-        min_num: 3,
+        online_num: 4,
+        offline_num: 3,
       },
       dialogVisible: false,
     };
