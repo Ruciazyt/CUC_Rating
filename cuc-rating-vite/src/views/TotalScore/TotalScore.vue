@@ -26,7 +26,7 @@
 <script>
 import { NavBar, List, Cell } from "vant";
 import { ref, reactive, toRefs } from "vue";
-import { useRouter } from "vue-router";
+import { useRouter, useRoute } from "vue-router";
 import { getAllTarget } from "@/apis/reportForm.js";
 export default {
   components: {
@@ -39,15 +39,22 @@ export default {
       scoreList: [],
     });
     const router = useRouter();
-
+    const route = useRoute();
     const getScoreList = () => {
-      const condition = {
-        time_string: "2022-04-27_07:40:26",
-        token: "Eyj2ni",
-      };
-      getAllTarget(condition).then((resp) => {
-        state.scoreList = resp.data;
-      });
+      console.log(route)
+      if (
+        route.query &&
+        route.query.time_string &&
+        route.query.token
+      ) {
+        const condition = {
+          time_string: route.query.time_string,
+          token: route.query.token,
+        };
+        getAllTarget(condition).then((resp) => {
+          state.scoreList = resp.data.progress;
+        });
+      }
     };
 
     getScoreList();
@@ -57,6 +64,8 @@ export default {
       router.push({
         path: "/",
         query: {
+          time_string:route.query.time_string,
+          token:route.query.token,
           id: id,
         },
       });

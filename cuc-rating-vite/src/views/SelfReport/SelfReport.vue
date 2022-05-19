@@ -27,6 +27,7 @@
       v-for="item in rateTargets"
       :key="item.id"
       :rateItem="item"
+      :formInfo="formInfo"
       :ref="setRef"
       class="FormItem"
     />
@@ -43,6 +44,7 @@ import {
   Row,
   Divider,
   Icon,
+  Notify,
 } from "vant";
 import { ref } from "vue";
 import FormItem from "./components/FormItem.vue";
@@ -59,6 +61,7 @@ export default {
     [Row.name]: Row,
     [Divider.name]: Divider,
     [Icon.name]: Icon,
+    [Notify.Component.name]: Notify.Component,
   },
   setup() {
     const themeVars = {
@@ -68,35 +71,52 @@ export default {
     const route = useRoute();
     const rateTargets = ref([]);
     const refArr = [];
+    let formInfo = {};
     const setRef = (el) => {
       if (el) {
         refArr.push(el);
       }
     };
+    const getFirstCondition = () => {
+      const paramsIndex = route.fullPath.indexOf("?");
+      if (paramsIndex !== -1) {
+        let raw_params = route.fullPath.slice(paramsIndex + 1);
+        let params_pair = raw_params.split("&");
+        const condition = {};
+        params_pair.forEach((pair) => {
+          const pairArr = pair.split("=");
+          condition[pairArr[0]] = pairArr[1];
+        });
+        formInfo = condition;
+      }
+    };
     const getTargets = () => {
-      const condition = {
-        time_string: "2022-04-27_07:40:26",
-        token: "Eyj2ni",
-      };
-      getAllTarget(condition).then((resp) => {
-        rateTargets.value = resp.data;
+      console.log(formInfo);
+      if (JSON.stringify(formInfo) === "{}") {
+        // 获取初始的token和string
+        getFirstCondition();
+      }
+      getAllTarget(formInfo).then((resp) => {
+        rateTargets.value = resp.data.progress;
         jumpToId();
       });
     };
 
     getTargets();
     const totalScoreClick = () => {
+      Notify({ type: "success", message: "自动保存成功" });
       router.push({
         path: "/totalScore",
+        query: formInfo,
       });
     };
 
     const jumpToId = () => {
-      if (route.query && route.query.id) {
+      if (route.params && route.params.id) {
         // console.log(route.query.id);
         // 首先找到当前id的元素在数组中的位置
         const location = rateTargets.value.findIndex(
-          (element) => element.id == route.query.id
+          (element) => element.id == route.params.id
         );
         if (location !== -1) {
           // 根据location获取ref， 取得对应的DOM
@@ -113,6 +133,7 @@ export default {
     return {
       themeVars,
       rateTargets,
+      formInfo,
       setRef,
       totalScoreClick,
     };

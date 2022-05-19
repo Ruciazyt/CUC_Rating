@@ -61,6 +61,7 @@ export default {
   },
   props: {
     rateItem: Object,
+    formInfo:Object
   },
   setup(props) {
     const checked = ref("1");
@@ -110,14 +111,14 @@ export default {
     };
     const handleStepperChange = debounce(() => {
       const condition = {
-        time_string: "2022-04-27_07:40:26",
-        token: "Eyj2ni",
+        time_string: props.formInfo.time_string,
+        token:props.formInfo.token,
         id: props.rateItem.id,
         score: valueRange.currentValue,
       };
       rate(condition).then((resp) => {
-        if (resp.status == 200) {
-          Notify({ type: 'success', message: '自动保存成功' });
+        if (resp.status != 200) {
+          Notify({ type: 'error', message: '评分提交失败，请联系管理员' });
         }
       });
     }, 2000);
