@@ -2,7 +2,7 @@
   <el-dialog title="创建问卷" :visible.sync="dialogVisible">
     <el-form
       :label-position="labelPosition"
-      label-width="80px"
+      label-width="160px"
       :model="formInfo"
     >
       <el-form-item label="线上打分团每组数量">

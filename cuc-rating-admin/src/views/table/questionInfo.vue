@@ -84,7 +84,7 @@ export default {
         token: tokenId,
       }
       getProgress(condition).then((resp) => {
-        this.progressList = resp.data;
+        this.progressList = resp.data.progress;
       })
       this.$refs.scoreList.dialogVisible = true;
     }

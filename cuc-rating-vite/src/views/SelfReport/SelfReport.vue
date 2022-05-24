@@ -7,7 +7,7 @@
           XXXX年机关职能部门、直（附）属单位考核会打分表
         </span>
       </van-col>
-      <van-col span="4"
+      <van-col span="4" offset="3"
         ><van-button
           type="success"
           size="small"
@@ -16,11 +16,11 @@
           >总分</van-button
         ></van-col
       >
-      <van-col span="4"
+      <!-- <van-col span="4"
         ><van-button type="success" size="small" icon="apps-o"
           >列表</van-button
         ></van-col
-      >
+      > -->
     </van-row>
     <van-divider :style="{ color: '#1989fa', borderColor: '#1989fa' }" />
     <FormItem
@@ -105,10 +105,12 @@ export default {
     getTargets();
     const totalScoreClick = () => {
       Notify({ type: "success", message: "自动保存成功" });
-      router.push({
-        path: "/totalScore",
-        query: formInfo,
-      });
+      setTimeout(() => {
+        router.push({
+          path: "/totalScore",
+          query: formInfo,
+        });
+      }, 1600);
     };
 
     const jumpToId = () => {

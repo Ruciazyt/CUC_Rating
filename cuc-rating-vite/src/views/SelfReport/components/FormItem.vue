@@ -61,15 +61,16 @@ export default {
   },
   props: {
     rateItem: Object,
-    formInfo:Object
+    formInfo: Object,
   },
   setup(props) {
     const checked = ref("1");
     const valueRange = reactive({
-      currentValue: props.rateItem.score === "-1" ? 0 : props.rateItem.score,
-      min: 0,
+      currentValue: props.rateItem.score === "-1" ? -1 : props.rateItem.score,
+      min: -1,
       max: 100,
     });
+
     const handleCheckedChange = (checked) => {
       switch (checked) {
         case "1":
@@ -94,11 +95,36 @@ export default {
           break;
       }
     };
+
     const setRange = (min, max) => {
       valueRange.max = max;
       valueRange.min = min;
     };
 
+    const initChecked = () => {
+      let val = valueRange.currentValue
+      if (val >= 90) {
+        checked.value = "1";
+        setRange(90, 100);
+      } else if (val >= 80) {
+        checked.value = "2";
+          setRange(80, 89);
+      } else if (val >= 70) {
+        checked.value = "3";
+         setRange(70, 79);
+      } else if (val >= 60) {
+        checked.value = "4";
+        setRange(60, 69);
+      } else if(val >= 0){
+        checked.value = "5";
+        setRange(0, 59);
+      } else{
+        // 没打分
+        checked.value = ""
+        setRange(-1, -1);
+      }
+    };
+    initChecked();
     // 防抖函数 - 控制多次触发只执行一次
     const debounce = (fn, delay) => {
       let timer;
@@ -109,19 +135,25 @@ export default {
         }, delay);
       };
     };
-    const handleStepperChange = debounce(() => {
+
+    const stepperChange = debounce(() => {
       const condition = {
         time_string: props.formInfo.time_string,
-        token:props.formInfo.token,
+        token: props.formInfo.token,
         id: props.rateItem.id,
         score: valueRange.currentValue,
       };
       rate(condition).then((resp) => {
         if (resp.status != 200) {
-          Notify({ type: 'error', message: '评分提交失败，请联系管理员' });
+          Notify({ type: "error", message: "评分提交失败，请联系管理员" });
         }
       });
-    }, 2000);
+    }, 1500);
+
+    const handleStepperChange = () => {
+      // checkedChangeWithScore(valueRange.currentValue)
+      stepperChange();
+    };
 
     return { checked, valueRange, handleCheckedChange, handleStepperChange };
   },

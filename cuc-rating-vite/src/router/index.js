@@ -1,5 +1,5 @@
 // 导入 router
-import { createRouter, createWebHashHistory } from 'vue-router'
+import { createRouter, createWebHistory } from 'vue-router'
 // 导入路由各页面配置
 
 const routes = [
@@ -19,7 +19,7 @@ const routes = [
   
 // 配置router对象
 const router = createRouter({
-    history: createWebHashHistory(),
+    history: createWebHistory(),
     routes
 })
 export default router
