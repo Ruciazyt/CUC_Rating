@@ -40,7 +40,7 @@ import {
   Icon,
   Notify,
 } from "vant";
-import { ref, reactive } from "vue";
+import { ref, reactive, nextTick, onMounted } from "vue";
 import FormItem from "./components/FormItem.vue";
 import TechForm from "./components/TechForm.vue";
 import PublicForm from "./components/PublicForm.vue";
@@ -91,7 +91,6 @@ export default {
       }
     };
     const getTargets = () => {
-      console.log(formInfo);
       if (JSON.stringify(formInfo) === "{}") {
         // 获取初始的token和string
         getFirstCondition();
@@ -99,7 +98,11 @@ export default {
       getAllTarget(formInfo).then((resp) => {
         rateTargets.value = resp.data.progress;
         state.type = resp.data.type[1]
-        jumpToId();
+        // await nextTick()
+        nextTick(() => {
+          jumpToId();
+        })
+
       });
     };
 
@@ -115,11 +118,11 @@ export default {
     };
 
     const jumpToId = () => {
-      if (route.params && route.params.id) {
+      if (route.query && route.query.id) {
         // console.log(route.query.id);
         // 首先找到当前id的元素在数组中的位置
         const location = rateTargets.value.findIndex(
-          (element) => element.id == route.params.id
+          (element) => element.id == route.query.id
         );
         if (location !== -1) {
           // 根据location获取ref， 取得对应的DOM
@@ -149,6 +152,6 @@ export default {
 .FormItem {
   margin: 0 0 5% 5%;
   box-sizing: border-box;
-  height: 130px;
+  /* height: 130px; */
 }
 </style>

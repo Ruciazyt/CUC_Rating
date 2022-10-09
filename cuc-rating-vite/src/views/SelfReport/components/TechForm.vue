@@ -1,10 +1,13 @@
 <template>
-    <van-row justify="space-between" style="margin-bottom: 1%">
-        <van-col span="8"><span style="font-weight: bold">{{ rateItem.name }}</span></van-col>
-    </van-row>
-    <FormItem v-for="item in scoreItemList" :key="item.id + item.value.toString()" :rateItem="item" :formInfo="formInfo">
-    </FormItem>
-    <van-divider />
+    <div>
+        <van-row justify="space-between" style="margin-bottom: 1%">
+            <van-col span="8"><span style="font-weight: bold">{{ rateItem.name }}</span></van-col>
+        </van-row>
+        <FormItem v-for="item in scoreItemList" :key="item.id + item.value.toString()" :rateItem="item"
+            :formInfo="formInfo">
+        </FormItem>
+        <van-divider />
+    </div>
 </template>
   
 <script>

@@ -11,7 +11,6 @@
         <van-radio name="4">基本合格</van-radio>
         <van-radio name="5">不合格</van-radio>
       </van-radio-group>
-    <van-divider />
   </div>
 </template>
 
