@@ -1,31 +1,16 @@
 <template>
   <div>
-    <van-row justify="space-between" style="margin-bottom: 1%">
-      <van-col span="8"
-        ><span style="font-weight: bold">{{ rateItem.name }}</span></van-col
-      >
-      <van-col span="8" offset="8">
-        <van-stepper
-          v-model="valueRange.currentValue"
-          @change="handleStepperChange"
-          :min="valueRange.min"
-          :max="valueRange.max"
-        />
-      </van-col>
-    </van-row>
-    <van-radio-group
-      v-model="checked"
-      direction="horizontal"
-      @change="handleCheckedChange"
-      icon-size="16px"
-      class="group"
-    >
-      <van-radio name="1">优秀</van-radio>
-      <van-radio name="2">良好</van-radio>
-      <van-radio name="3">合格</van-radio>
-      <van-radio name="4">基本合格</van-radio>
-      <van-radio name="5">不合格</van-radio>
-    </van-radio-group>
+      <p>{{rateItem.label}}</p>
+      <van-stepper v-model="valueRange.currentValue" @change="handleStepperChange" :min="valueRange.min"
+        :max="valueRange.max" />
+      <van-radio-group v-model="checked" direction="horizontal" @change="handleCheckedChange" icon-size="16px"
+        class="group">
+        <van-radio name="1">优秀</van-radio>
+        <van-radio name="2">良好</van-radio>
+        <van-radio name="3">合格</van-radio>
+        <van-radio name="4">基本合格</van-radio>
+        <van-radio name="5">不合格</van-radio>
+      </van-radio-group>
     <van-divider />
   </div>
 </template>
@@ -62,6 +47,7 @@ export default {
   props: {
     rateItem: Object,
     formInfo: Object,
+    deptType: String,
   },
   setup(props) {
     const checked = ref("1");
@@ -90,8 +76,8 @@ export default {
           setRange(60, 69);
           break;
         case "5":
-          valueRange.currentValue = 0;
-          setRange(0, 59);
+          valueRange.currentValue = 50;
+          setRange(50, 59);
           break;
       }
     };
@@ -108,22 +94,23 @@ export default {
         setRange(90, 100);
       } else if (val >= 80) {
         checked.value = "2";
-          setRange(80, 89);
+        setRange(80, 89);
       } else if (val >= 70) {
         checked.value = "3";
-         setRange(70, 79);
+        setRange(70, 79);
       } else if (val >= 60) {
         checked.value = "4";
         setRange(60, 69);
-      } else if(val >= 0){
+      } else if (val >= 0) {
         checked.value = "5";
         setRange(0, 59);
-      } else{
+      } else {
         // 没打分
         checked.value = ""
         setRange(-1, -1);
       }
     };
+    // 根据得分初始化 选项按钮
     initChecked();
     // 防抖函数 - 控制多次触发只执行一次
     const debounce = (fn, delay) => {
@@ -142,6 +129,7 @@ export default {
         token: props.formInfo.token,
         id: props.rateItem.id,
         score: valueRange.currentValue,
+        no:props.rateItem.value
       };
       rate(condition).then((resp) => {
         if (resp.status != 200) {
@@ -151,7 +139,6 @@ export default {
     }, 1500);
 
     const handleStepperChange = () => {
-      // checkedChangeWithScore(valueRange.currentValue)
       stepperChange();
     };
 

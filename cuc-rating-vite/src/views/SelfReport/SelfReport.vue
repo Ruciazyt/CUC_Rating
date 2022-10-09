@@ -7,15 +7,9 @@
           XXXX年机关职能部门、直（附）属单位考核会打分表
         </span>
       </van-col>
-      <van-col span="4" offset="3"
-        ><van-button
-          type="success"
-          size="small"
-          icon="points"
-          @click="totalScoreClick"
-          >总分</van-button
-        ></van-col
-      >
+      <van-col span="4" offset="3">
+        <van-button type="success" size="small" icon="points" @click="totalScoreClick">总分</van-button>
+      </van-col>
       <!-- <van-col span="4"
         ><van-button type="success" size="small" icon="apps-o"
           >列表</van-button
@@ -23,14 +17,14 @@
       > -->
     </van-row>
     <van-divider :style="{ color: '#1989fa', borderColor: '#1989fa' }" />
-    <FormItem
-      v-for="item in rateTargets"
-      :key="item.id"
-      :rateItem="item"
-      :formInfo="formInfo"
-      :ref="setRef"
-      class="FormItem"
-    />
+    <div v-if="state.type === '0'">
+      <TechForm v-for="item in rateTargets" :key="item.id" :rateItem="item" :formInfo="formInfo" :ref="setRef"
+        :deptType="state.type" class="FormItem" />
+    </div>
+    <div v-if="state.type === '1'">
+      <PublicForm v-for="item in rateTargets" :key="item.id" :rateItem="item" :formInfo="formInfo" :ref="setRef"
+        :deptType="state.type" class="FormItem" />
+    </div>
   </van-config-provider>
 </template>
 
@@ -46,13 +40,17 @@ import {
   Icon,
   Notify,
 } from "vant";
-import { ref } from "vue";
+import { ref, reactive } from "vue";
 import FormItem from "./components/FormItem.vue";
+import TechForm from "./components/TechForm.vue";
+import PublicForm from "./components/PublicForm.vue";
 import { useRouter, useRoute } from "vue-router";
 import { getAllTarget } from "@/apis/reportForm.js";
 export default {
   components: {
     FormItem,
+    TechForm,
+    PublicForm,
     [Button.name]: Button,
     [NavBar.name]: NavBar,
     [Cell.name]: Cell,
@@ -62,6 +60,7 @@ export default {
     [Divider.name]: Divider,
     [Icon.name]: Icon,
     [Notify.Component.name]: Notify.Component,
+    PublicForm
   },
   setup() {
     const themeVars = {
@@ -70,6 +69,7 @@ export default {
     const router = useRouter();
     const route = useRoute();
     const rateTargets = ref([]);
+    const state = reactive({ type: null })
     const refArr = [];
     let formInfo = {};
     const setRef = (el) => {
@@ -98,6 +98,7 @@ export default {
       }
       getAllTarget(formInfo).then((resp) => {
         rateTargets.value = resp.data.progress;
+        state.type = resp.data.type[1]
         jumpToId();
       });
     };
@@ -136,6 +137,7 @@ export default {
       themeVars,
       rateTargets,
       formInfo,
+      state,
       setRef,
       totalScoreClick,
     };
