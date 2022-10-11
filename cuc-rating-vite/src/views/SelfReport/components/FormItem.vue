@@ -1,16 +1,16 @@
 <template>
   <div>
-      <p>{{rateItem.label}}</p>
-      <van-stepper v-model="valueRange.currentValue" @change="handleStepperChange" :min="valueRange.min"
-        :max="valueRange.max" />
-      <van-radio-group v-model="checked" direction="horizontal" @change="handleCheckedChange" icon-size="16px"
-        class="group">
-        <van-radio name="1">优秀</van-radio>
-        <van-radio name="2">良好</van-radio>
-        <van-radio name="3">合格</van-radio>
-        <van-radio name="4">基本合格</van-radio>
-        <van-radio name="5">不合格</van-radio>
-      </van-radio-group>
+    <p>{{rateItem.label}}</p>
+    <van-stepper v-show="scoreShow.isShow" v-model="valueRange.currentValue" @change="handleStepperChange"
+      :min="valueRange.min" :max="valueRange.max" />
+    <van-radio-group v-model="checked" direction="horizontal" @change="handleCheckedChange" icon-size="16px"
+      class="group">
+      <van-radio name="1">优秀</van-radio>
+      <van-radio name="2">良好</van-radio>
+      <van-radio name="3">合格</van-radio>
+      <van-radio name="4">基本合格</van-radio>
+      <van-radio name="5">不合格</van-radio>
+    </van-radio-group>
   </div>
 </template>
 
@@ -51,12 +51,15 @@ export default {
   setup(props) {
     const checked = ref("1");
     const valueRange = reactive({
-      currentValue: props.rateItem.score === "-1" ? -1 : props.rateItem.score,
+      currentValue: props.rateItem.score === -1 ? -1 : props.rateItem.score,
       min: -1,
       max: 100,
     });
-
+    const scoreShow = reactive({
+      isShow: props.rateItem.score === -1 ? false : true,
+    })
     const handleCheckedChange = (checked) => {
+      scoreShow.isShow = true;
       switch (checked) {
         case "1":
           valueRange.currentValue = 90;
@@ -128,7 +131,7 @@ export default {
         token: props.formInfo.token,
         id: props.rateItem.id,
         score: valueRange.currentValue,
-        no:props.rateItem.value
+        no: props.rateItem.value
       };
       rate(condition).then((resp) => {
         if (resp.status != 200) {
@@ -141,7 +144,7 @@ export default {
       stepperChange();
     };
 
-    return { checked, valueRange, handleCheckedChange, handleStepperChange };
+    return { checked, valueRange, scoreShow, handleCheckedChange, handleStepperChange };
   },
 };
 </script>
