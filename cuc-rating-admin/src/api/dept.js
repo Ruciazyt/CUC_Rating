@@ -1,7 +1,11 @@
-import { getRequest, postRequest, deleteRequest } from "@/utils/request";
+import { getRequest, postRequest, deleteRequest, postBodyRequest } from "@/utils/request";
 
 export function getAllDepts() {
   return getRequest("/depts");
+}
+
+export function updateAllDepts(condition){
+  return postBodyRequest("/depts",condition)
 }
 
 export function addDept(params) {

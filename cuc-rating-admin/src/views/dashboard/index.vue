@@ -2,36 +2,24 @@
   <div>
     <aside>
       现有部门
-      <el-button
-        type="text"
-        icon="el-icon-plus"
-        @click="handleAddClick"
-      ></el-button>
+      <el-button type="text" icon="el-icon-plus" @click="handleAddClick"></el-button>
 
     </aside>
     <p class="deptTypeTitle">教学教研单位</p>
     <el-card class="deptCard">
-      <el-tag
-        v-for="tag in deptsList_JY"
-        :key="tag.name"
-        class="deptTag"
-        closable
-        @close="handleClose(tag.name)"
-      >
-        {{ tag.name }}
-      </el-tag>
+      <draggable v-model="deptsList_JY" group="JY_depts" @start="drag=true" @end="drag=false" @change="handleMove()">
+        <el-tag v-for="tag in deptsList_JY" :key="tag.name" class="deptTag" closable @close="handleClose(tag.name)">
+          {{ tag.name }}
+        </el-tag>
+      </draggable>
     </el-card>
     <p class="deptTypeTitle">党群行政职能部门</p>
     <el-card class="deptCard">
-      <el-tag
-        v-for="tag in deptsList_DQ"
-        :key="tag.name"
-        class="deptTag"
-        closable
-        @close="handleClose(tag.name)"
-      >
-        {{ tag.name }}
-      </el-tag>
+      <draggable v-model="deptsList_DQ" group="DQ_depts" @start="drag=true" @end="drag=false" @change="handleMove()">
+        <el-tag v-for="tag in deptsList_DQ" :key="tag.name" class="deptTag" closable @close="handleClose(tag.name)">
+          {{ tag.name }}
+        </el-tag>
+      </draggable>
     </el-card>
     <el-dialog title="新增目标" :visible.sync="dialogFormVisible">
       <el-form :model="form">
@@ -40,12 +28,7 @@
         </el-form-item>
         <el-form-item label="部门类型">
           <el-select v-model="form.type" autocomplete="off">
-            <el-option
-              v-for="option in deptTypes"
-              :label="option.label"
-              :key="option.id"
-              :value="option.id"
-            >
+            <el-option v-for="option in deptTypes" :label="option.label" :key="option.id" :value="option.id">
             </el-option>
           </el-select>
         </el-form-item>
@@ -59,13 +42,17 @@
 </template>
 
 <script>
-import { getAllDepts, deleteDept, addDept } from "@/api/dept";
+import { getAllDepts, deleteDept, addDept, updateAllDepts } from "@/api/dept";
+import draggable from 'vuedraggable'
 export default {
   name: "Dashboard",
+  components: { draggable },
   data() {
     return {
       deptsList_JY: [],
+      deptsList_JY_SORT: [],
       deptsList_DQ: [],
+      testArr: [],
       dialogFormVisible: false,
       form: {
         name: "",
@@ -160,6 +147,21 @@ export default {
           });
         });
     },
+    handleMove() {
+      const condition = {
+        0: this.deptsList_JY.map(item => item.name),
+        1: this.deptsList_DQ.map(item => item.name)
+      }
+      updateAllDepts(condition).then(res => {
+        if (res.status == 200) {
+          this.$message({
+            type: "success",
+            message: "排序变更!",
+          });
+          this.getAllDepts();
+        }
+      })
+    }
   },
 };
 </script>
@@ -178,6 +180,7 @@ aside {
   color: #2c3e50;
   -webkit-font-smoothing: antialiased;
 }
+
 .deptCard {
   margin: 20px;
 }
