@@ -112,12 +112,12 @@ export const postRequest = (url, params) => {
 
 export const postBodyRequest = (url, params) => {
   return axios({
-    method: "POST",
+    method: "post",
     url: process.env.VUE_APP_BASE_API + `${url}`,
     data: JSON.stringify(params),
     dataType: "json",
     headers: {
-      "Content-Type": "application/json;charset=utf-8",
+      "Content-Type": "application/json",
     },
   });
 };

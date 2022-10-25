@@ -8,7 +8,7 @@
     <p class="deptTypeTitle">教学教研单位</p>
     <el-card class="deptCard">
       <draggable v-model="deptsList_JY" group="JY_depts" @start="drag=true" @end="drag=false" @change="handleMove()">
-        <el-tag v-for="tag in deptsList_JY" :key="tag.name" class="deptTag" closable @close="handleClose(tag.name)">
+        <el-tag v-for="tag in deptsList_JY" :key="tag.name" class="deptTag" closable @close="handleClose(tag)">
           {{ tag.name }}
         </el-tag>
       </draggable>
@@ -16,7 +16,7 @@
     <p class="deptTypeTitle">党群行政职能部门</p>
     <el-card class="deptCard">
       <draggable v-model="deptsList_DQ" group="DQ_depts" @start="drag=true" @end="drag=false" @change="handleMove()">
-        <el-tag v-for="tag in deptsList_DQ" :key="tag.name" class="deptTag" closable @close="handleClose(tag.name)">
+        <el-tag v-for="tag in deptsList_DQ" :key="tag.name" class="deptTag" closable @close="handleClose(tag)">
           {{ tag.name }}
         </el-tag>
       </draggable>
@@ -42,7 +42,8 @@
 </template>
 
 <script>
-import { getAllDepts, deleteDept, addDept, updateAllDepts } from "@/api/dept";
+import { getAllDepts, deleteDept, updateAllDepts } from "@/api/dept";
+import { deleteByArrName } from '../../utils/arrUtils'
 import draggable from 'vuedraggable'
 export default {
   name: "Dashboard",
@@ -52,6 +53,8 @@ export default {
       deptsList_JY: [],
       deptsList_JY_SORT: [],
       deptsList_DQ: [],
+      rawDept_JY: [],
+      rawDept_DQ: [],
       testArr: [],
       dialogFormVisible: false,
       form: {
@@ -77,30 +80,20 @@ export default {
   methods: {
     getAllDepts() {
       getAllDepts().then((resp) => {
-        const resObj = resp.data;
-        const JY_depts = [];
-        const DQ_depts = [];
-        Object.keys(resObj).forEach((key) => {
-          if (resObj[key] == 0) {
-            JY_depts.push({
-              id: resObj[key],
-              name: key,
-            });
-          } else if (resObj[key] == 1) {
-            DQ_depts.push({
-              id: resObj[key],
-              name: key,
-            });
-          }
-          this.deptsList_JY = JY_depts;
-          this.deptsList_DQ = DQ_depts;
-        });
+        [this.rawDept_JY, this.rawDept_DQ] = resp.data;
+        this.deptsList_JY = this.rawDept_JY.map((value, key) => {
+          return { id: key, name: value, type: 0 }
+        })
+        this.deptsList_DQ = this.rawDept_DQ.map((value, key) => {
+          return { id: key, name: value, type: 1 }
+        })
       });
     },
     handleSubmit() {
-      const condition = Object.assign({}, this.form);
-      addDept(condition).then((resp) => {
-        console.log(resp);
+      const { name, type } = this.form
+      const deptArrs = [this.rawDept_JY.slice(), this.rawDept_DQ.slice()]
+      deptArrs[type].push(name)
+      updateAllDepts(deptArrs).then((resp) => {
         if (resp.status == 200) {
           this.$notify({
             title: "成功",
@@ -113,6 +106,7 @@ export default {
             message: "添加失败",
           });
         }
+        this.form.name = ''
         this.dialogFormVisible = false;
         this.getAllDepts();
       });
@@ -120,17 +114,17 @@ export default {
     handleAddClick() {
       this.dialogFormVisible = true;
     },
-    handleClose(tagName) {
+    handleClose(tag) {
       this.$confirm("此操作将永久删除, 是否继续?", "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
         type: "warning",
       })
         .then(() => {
-          const condition = {
-            name: tagName,
-          };
-          deleteDept(condition).then((resp) => {
+          const { name, type } = tag
+          const deptArrs = [this.rawDept_JY.slice(), this.rawDept_DQ.slice()]
+          deptArrs[type] = deleteByArrName(deptArrs[type], name)
+          updateAllDepts(deptArrs).then((resp) => {
             if (resp.status == 200) {
               this.$message({
                 type: "success",
@@ -148,10 +142,8 @@ export default {
         });
     },
     handleMove() {
-      const condition = {
-        0: this.deptsList_JY.map(item => item.name),
-        1: this.deptsList_DQ.map(item => item.name)
-      }
+      const condition = []
+      condition.push(this.deptsList_JY.map(item => item.name), this.deptsList_DQ.map(item => item.name))
       updateAllDepts(condition).then(res => {
         if (res.status == 200) {
           this.$message({
