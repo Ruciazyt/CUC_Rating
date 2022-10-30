@@ -1,13 +1,15 @@
 <template>
-    <div>
-        <van-row justify="space-between" style="margin-bottom: 1%">
-            <van-col span="8"><span style="font-weight: bold">{{ rateItem.name }}</span></van-col>
-        </van-row>
-        <FormItem v-for="item in scoreItemList" :key="item.id + item.value.toString()" :rateItem="item"
-            :formInfo="formInfo">
-        </FormItem>
-        <van-divider />
-    </div>
+    <van-row justify="space-between" style="margin-bottom: 1%">
+        <van-col span="8"><span style="font-weight: bold">{{ rateItem.name }}</span></van-col>
+    </van-row>
+    <FormItem v-for="item in scoreItemList" :key="item.id + item.value.toString()" :rateItem="item"
+        :formInfo="formInfo">
+    </FormItem>
+    <van-row justify="space-between" style="margin-bottom: 1%">
+        <van-col span="8"><span style="font-weight: bold">部门成员打分</span></van-col>
+    </van-row>
+    <FormItem v-for="item in members" :key="item.label" :rateItem="item" :formInfo="formInfo" :targetType="item.targetType">
+    </FormItem>
 </template>
   
 <script>
@@ -52,7 +54,10 @@ export default {
             { id: props.rateItem.id, label: "改革创新奖", value: 2, score: props.rateItem.score[2] },
             { id: props.rateItem.id, label: "年度进步奖", value: 3, score: props.rateItem.score[3] },
         ]
-        return { scoreItemList }
+        const members = Object.keys(props.rateItem.members).map((key) => {
+            return { id:props.rateItem.id, label: key, score: props.rateItem.members[key], targetType:1 }
+        })
+        return { scoreItemList, members }
     }
 };
 </script>

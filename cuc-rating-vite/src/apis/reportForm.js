@@ -10,3 +10,7 @@ export function getAllTarget(params) {
 export function rate(params) {
     return postRequest('/rate', params)
 }
+
+export function rateMember(params) {
+    return postRequest('/rate_member', params)
+}

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <p>{{rateItem.label}}</p>
+    <p>{{ rateItem.label }}</p>
     <van-stepper v-show="scoreShow.isShow" v-model="valueRange.currentValue" @change="handleStepperChange"
       :min="valueRange.min" :max="valueRange.max" />
     <van-radio-group v-model="checked" direction="horizontal" @change="handleCheckedChange" icon-size="16px"
@@ -28,7 +28,7 @@ import {
   Notify,
 } from "vant";
 import { reactive, ref } from "vue";
-import { rate } from "@/apis/reportForm";
+import { rate, rateMember } from "@/apis/reportForm";
 export default {
   name: "FormItem",
   components: {
@@ -47,6 +47,10 @@ export default {
     rateItem: Object,
     formInfo: Object,
     deptType: String,
+    targetType: {
+      default: 0,
+      type: Number
+    }, // 用来区分是部门还是成员打分
   },
   setup(props) {
     const checked = ref("1");
@@ -126,18 +130,39 @@ export default {
     };
 
     const stepperChange = debounce(() => {
-      const condition = {
-        time_string: props.formInfo.time_string,
-        token: props.formInfo.token,
-        id: props.rateItem.id,
-        score: valueRange.currentValue,
-        no: props.rateItem.value
-      };
-      rate(condition).then((resp) => {
-        if (resp.status != 200) {
-          Notify({ type: "error", message: "评分提交失败，请联系管理员" });
-        }
-      });
+      if (props.targetType === 1) {
+        const condition = {
+          time_string: props.formInfo.time_string,
+          token: props.formInfo.token,
+          id: props.rateItem.id,
+          score: valueRange.currentValue,
+          member: props.rateItem.label
+        };
+        rateMember(condition).then((resp) => {
+          if (resp.status === 200) {
+            
+          } else {
+            Notify({ type: "warning", message: "评分提交失败，请联系管理员" });
+          }
+        });
+        return
+      } else {
+        const condition = {
+          time_string: props.formInfo.time_string,
+          token: props.formInfo.token,
+          id: props.rateItem.id,
+          score: valueRange.currentValue,
+          no: props.rateItem.value
+        };
+
+        rate(condition).then((resp) => {
+          if (resp.status === 200) {
+
+          } else {
+            Notify({ type: "warning", message: "评分提交失败，请联系管理员" });
+          }
+        });
+      }
     }, 1500);
 
     const handleStepperChange = () => {
