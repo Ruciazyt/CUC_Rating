@@ -162,7 +162,14 @@ export default {
 
     const nextBtnDisable = () => {
       const scoreList = rateTargets.value[state.targetId].score || []
-      return scoreList.includes(0)
+      const memberScoreList = rateTargets.value[state.targetId].members || {}
+      let memberFlag = false
+      Object.keys(memberScoreList).forEach(key=>{
+        if(memberScoreList[key] === 0){
+          memberFlag = true
+        }
+      })
+      return scoreList.includes(0) || memberFlag
     }
 
     return {

@@ -136,7 +136,7 @@ export default {
           token: props.formInfo.token,
           id: props.rateItem.id,
           score: valueRange.currentValue,
-          member: props.rateItem.label
+          name: props.rateItem.label
         };
         rateMember(condition).then((resp) => {
           if (resp.status === 200) {
