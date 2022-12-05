@@ -15,7 +15,7 @@
         class="scoreItem"
         @click="onClickJumpToId(item.id)"
       >
-        <span class="itemId"> {{ item.id }} </span>
+        <span class="itemId"> {{( item.id + 1)}} </span>
         <span class="itemName"> {{ item.name }}</span>
         <span class="itemScore"> {{ item.score }}</span>
       </li>
@@ -81,7 +81,7 @@ export default {
 
 <style scoped>
 ul {
-  padding: 20px 40px 0px 40px;
+  padding: 20px 10px 0px 10px;
 }
 
 .scoreItem {
@@ -97,7 +97,8 @@ ul {
   line-height: 30px;
 }
 .itemName {
-  margin-left: 30px;
+  font-size: 14px;
+  margin-left: 5px;
   color: rgb(97, 198, 235);
   line-height: 30px;
 }

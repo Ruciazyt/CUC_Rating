@@ -1,15 +1,19 @@
 <template>
     <van-row justify="space-between" style="margin-bottom: 1%">
-        <van-col span="8"><span style="font-weight: bold">{{ rateItem.name }}</span></van-col>
+        <span style="font-weight: bold">{{ rateItem.name }}</span>
     </van-row>
-    <FormItem v-for="(item,index) in scoreItemList" :key="item.id + item.value.toString()" :rateItem="item"
-        :formInfo="formInfo">
+    <FormItem v-for="(item, index) in scoreItemList" :key="item.id + item.value.toString()" :rateItem="item"
+        :formInfo="formInfo" @updateScore="updateScore">
     </FormItem>
-    <van-row justify="space-between" style="margin-bottom: 1%">
-        <van-col span="8"><span style="font-weight: bold">部门成员打分</span></van-col>
-    </van-row>
-    <FormItem v-for="item in members" :key="item.id" :rateItem="item" :formInfo="formInfo" :targetType="item.targetType">
-    </FormItem>
+    <van-divider :style="{ color: '#1989fa', borderColor: '#1989fa' }" />
+    <div style="background:#f7f8fa">
+        <van-row justify="space-between" style="margin-bottom: 1%">
+            <van-col span="8"><span style="font-weight: bold">部门成员打分</span></van-col>
+        </van-row>
+        <FormItem v-for="item in members" :key="item.id" :rateItem="item" :formInfo="formInfo"
+            :targetType="item.targetType" @updateScore="updateScore">
+        </FormItem>
+    </div>
 </template>
   
 <script>
@@ -48,16 +52,19 @@ export default {
         deptType: String,
         targets: Array
     },
-    setup(props) {
+    emits: ['updateScore'],
+    setup(props, { emit }) {
         const scoreItemList = [
-            { id: props.rateItem.id, label: "基础评分", value: 0, score: props.rateItem.score[0] },
-            { id: props.rateItem.id, label: "年度贡献奖", value: 1, score: props.rateItem.score[1] },
+            { id: props.rateItem.id, label: "年度综合评分", value: 0, score: props.rateItem.score[0] },
+            { id: props.rateItem.id, label: "年度贡献评分", value: 1, score: props.rateItem.score[1] },
         ]
         const members = Object.keys(props.rateItem.members).map((key) => {
-            console.log(props.rateItem.members[key])
-            return { id: key, label: key, score: props.rateItem.members[key], targetType:1 }
+            return { id: key, label: key, score: props.rateItem.members[key], targetType: 1 }
         })
-        return { scoreItemList, members }
+        const updateScore = () => {
+            emit('updateScore')
+        }
+        return { scoreItemList, members, updateScore }
     }
 };
 </script>

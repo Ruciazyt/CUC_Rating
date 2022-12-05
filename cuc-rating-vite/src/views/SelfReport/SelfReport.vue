@@ -8,18 +8,20 @@
         </span>
       </van-col>
       <van-col span="4" offset="3">
-        <van-button type="success" size="small" icon="points" @click="totalScoreClick()">总分</van-button>
+        <van-button type="success" @click="totalScoreClick()" style="font-weight:bold;width: 60px;">总分</van-button>
       </van-col>
     </van-row>
     <van-divider :style="{ color: '#1989fa', borderColor: '#1989fa' }" />
-    <div v-if="state.type === '0'">
-      <div v-for="(item, index) in rateTargets" v-show="index === state.targetId" :key="item.id">
-        <TechForm :rateItem="item" :formInfo="formInfo" :ref="setRef" :deptType="state.type" />
+    <div style="margin-left:2%" v-if="state.type === '0'">
+      <div v-for="(item, index) in rateTargets" v-show="index == state.targetId" :key="item.id">
+        <TechForm :rateItem="item" :formInfo="formInfo" :ref="setRef" :deptType="state.type"
+          @updateScore='updateScore' />
       </div>
     </div>
-    <div v-if="state.type === '1'">
-      <div v-for="(item, index) in rateTargets" v-show="index === state.targetId" :key="item.id">
-        <PublicForm :rateItem="item" :formInfo="formInfo" :ref="setRef" :deptType="state.type" />
+    <div style="margin-left:2%" v-if="state.type === '1'">
+      <div v-for="(item, index) in rateTargets" v-show="index == state.targetId" :key="item.id">
+        <PublicForm :rateItem="item" :formInfo="formInfo" :ref="setRef" :deptType="state.type"
+          @updateScore='updateScore' />
       </div>
     </div>
     <div class="controlBtn">
@@ -65,6 +67,7 @@ export default {
     [Notify.Component.name]: Notify.Component,
     PublicForm
   },
+  emits: ['updateScore'],
   setup() {
     const themeVars = {
       navBarTitleFontSize: "15px",
@@ -93,7 +96,7 @@ export default {
         formInfo = condition;
       }
     };
-    const getTargets = () => {
+    const getTargets = async () => {
       if (JSON.stringify(formInfo) === "{}") {
         // 获取初始的token和string
         getFirstCondition();
@@ -103,14 +106,20 @@ export default {
         state.rateTargetsLength = rateTargets.value.length
         state.type = resp.data.type[1]
         // await nextTick()
-        nextTick(() => {
-          jumpToId();
-        })
+        console.log(route.query.id)
+        if (route.query && route.query.id) {
+          state.targetId = route.query.id
+        }
+        console.log(state.targetId)
+        // nextTick(() => {
+        //   jumpToId();
+        // })
 
       });
     };
 
     getTargets();
+
     const totalScoreClick = async () => {
       Notify({ type: "success", message: "自动保存成功" });
       setTimeout(() => {
@@ -125,17 +134,17 @@ export default {
       if (route.query && route.query.id) {
         // console.log(route.query.id);
         // 首先找到当前id的元素在数组中的位置
-        const location = rateTargets.value.findIndex(
-          (element) => element.id == route.query.id
-        );
-        if (location !== -1) {
-          // 根据location获取ref， 取得对应的DOM
-          const el = refArr[location];
-          const offsetTop = el.$el.offsetTop;
-          // console.log(el.$el);
-          const htmlDom = document.documentElement;
-          htmlDom.scrollTo(0, offsetTop);
-        }
+        // const location = rateTargets.value.findIndex(
+        //   (element) => element.id == route.query.id
+        // );
+        // if (location !== -1) {
+        //   // 根据location获取ref， 取得对应的DOM
+        //   const el = refArr[location];
+        //   const offsetTop = el.$el.offsetTop;
+        //   // console.log(el.$el);
+        //   const htmlDom = document.documentElement;
+        //   htmlDom.scrollTo(0, offsetTop);
+        // }
       } else {
         // console.log(route);
       }
@@ -147,25 +156,32 @@ export default {
       }
     }
 
+    const updateScore = async () => {
+      await getTargets()
+      console.log("重新获取分数")
+    }
+
     const handleNextClick = () => {
-      Notify({ type: "success", message: "保存中..." });
+      Notify({ type: "success", message: "检查评分数据中..." });
       setTimeout(() => {
-        const nextBtnStatus = nextBtnDisable()
-        if (nextBtnStatus) {
-          Notify({ type: "warning", message: "当前部门未完成评分" });
-          return
-        }
-        if (state.targetId < state.rateTargetsLength - 1)
-          state.targetId++
+        nextBtnDisable().then(res => {
+          let nextBtnStatus = res
+          if (nextBtnStatus) {
+            Notify({ type: "warning", message: "当前部门未完成评分" });
+            return
+          }
+          if (state.targetId < state.rateTargetsLength - 1)
+            state.targetId++
+        })
       }, 1500)
     }
 
-    const nextBtnDisable = () => {
+    const nextBtnDisable = async () => {
       const scoreList = rateTargets.value[state.targetId].score || []
       const memberScoreList = rateTargets.value[state.targetId].members || {}
       let memberFlag = false
-      Object.keys(memberScoreList).forEach(key=>{
-        if(memberScoreList[key] === 0){
+      Object.keys(memberScoreList).forEach(key => {
+        if (memberScoreList[key] === 0) {
           memberFlag = true
         }
       })
@@ -181,6 +197,7 @@ export default {
       handlePreClick,
       handleNextClick,
       totalScoreClick,
+      updateScore
     };
   },
 };

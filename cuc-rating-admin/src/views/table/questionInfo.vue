@@ -84,7 +84,11 @@ export default {
         token: tokenId,
       }
       getProgress(condition).then((resp) => {
-        this.progressList = resp.data.progress;
+        const tmpData=  resp.data.progress
+        this.progressList = tmpData.map(element => {
+          element.sorce_display = element.score.join(' ')
+          return element
+        });
       })
       this.$refs.scoreList.dialogVisible = true;
     }

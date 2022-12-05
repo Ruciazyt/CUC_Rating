@@ -19,3 +19,7 @@ export function getProgress(params) {
 export function exportDoc(params) {
   return fileDownloadRequest('/documents', params)
 }
+
+export function exportRes(params){
+  return fileDownloadRequest('/export',params)
+}

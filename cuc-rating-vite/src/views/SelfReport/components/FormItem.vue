@@ -1,15 +1,19 @@
 <template>
   <div>
-    <p>{{ rateItem.label }}</p>
-    <van-stepper v-show="scoreShow.isShow" v-model="valueRange.currentValue" @change="handleStepperChange"
-      :min="valueRange.min" :max="valueRange.max" />
-    <van-radio-group v-model="checked" direction="horizontal" @change="handleCheckedChange" icon-size="16px"
+    <van-row>
+      <p>{{ rateItem.label }}</p>
+      <div class="scoreCenter">
+        <van-stepper v-show="scoreShow.isShow" v-model="valueRange.currentValue" @change="handleStepperChange"
+          :min="valueRange.min" :max="valueRange.max" />
+      </div>
+    </van-row>
+    <van-radio-group v-model="checked" direction="horizontal" @change="handleCheckedChange" icon-size="24px"
       class="group">
-      <van-radio name="1">优秀</van-radio>
-      <van-radio name="2">良好</van-radio>
-      <van-radio name="3">合格</van-radio>
-      <van-radio name="4">基本合格</van-radio>
-      <van-radio name="5">不合格</van-radio>
+      <van-radio name="1" class="radioItem">优秀</van-radio>
+      <van-radio name="2" class="radioItem">良好</van-radio>
+      <van-radio name="3" class="radioItem">合格</van-radio>
+      <van-radio name="4" class="radioItem">基本合格</van-radio>
+      <van-radio name="5" class="radioItem">不合格</van-radio>
     </van-radio-group>
   </div>
 </template>
@@ -27,7 +31,7 @@ import {
   Divider,
   Notify,
 } from "vant";
-import { reactive, ref } from "vue";
+import { reactive, ref, provide } from "vue";
 import { rate, rateMember } from "@/apis/reportForm";
 export default {
   name: "FormItem",
@@ -52,7 +56,8 @@ export default {
       type: Number
     }, // 用来区分是部门还是成员打分
   },
-  setup(props) {
+  emits: ['updateScore'],
+  setup(props, { emit }) {
     const checked = ref("1");
     const valueRange = reactive({
       currentValue: props.rateItem.score === -1 ? -1 : props.rateItem.score,
@@ -107,13 +112,13 @@ export default {
       } else if (val >= 60) {
         checked.value = "4";
         setRange(60, 69);
-      } else if (val >= 0) {
+      } else if (val > 0) {
         checked.value = "5";
-        setRange(0, 59);
+        setRange(50, 59);
       } else {
         // 没打分
         checked.value = ""
-        setRange(-1, -1);
+        // setRange(-1, -1);
       }
     };
     // 根据得分初始化 选项按钮
@@ -140,7 +145,9 @@ export default {
         };
         rateMember(condition).then((resp) => {
           if (resp.status === 200) {
-            
+            // TODO
+            // 向外提示更新整体数据
+            emit('updateScore')
           } else {
             Notify({ type: "warning", message: "评分提交失败，请联系管理员" });
           }
@@ -154,10 +161,11 @@ export default {
           score: valueRange.currentValue,
           no: props.rateItem.value
         };
-
         rate(condition).then((resp) => {
           if (resp.status === 200) {
-
+            // TODO
+            // 向外提示更新整体数据
+            emit('updateScore')
           } else {
             Notify({ type: "warning", message: "评分提交失败，请联系管理员" });
           }
@@ -178,5 +186,15 @@ export default {
 .group {
   align-content: space-around;
   height: 80px;
+}
+
+.radioItem{
+  margin-left: 5%;
+}
+.scoreCenter{
+  margin-left: 5%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 </style>

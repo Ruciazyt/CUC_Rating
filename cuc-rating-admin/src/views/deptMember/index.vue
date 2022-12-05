@@ -12,7 +12,8 @@
         </aside>
 
         <el-card style="margin:1%">
-            <el-table v-loading="listLoading"
+            <el-table v-loading="listLoading" ref="dragTable"
+                :row-key="row => row.name"
                 :data="deptMembers.slice((currentPage - 1) * pageSize, currentPage * pageSize)"
                 element-loading-text="Loading" border fit highlight-current-row>
                 <el-table-column align="center" label="序号" width="95" prop="id" />
@@ -50,6 +51,7 @@
 import { getDeptMembers, setDeptMembers } from '@/api/dept'
 import { deleteByArrName } from '../../utils/arrUtils'
 import { getAllDepts } from '@/api/dept'
+import Sortable from 'sortablejs'
 export default {
     data() {
         return {
@@ -61,10 +63,12 @@ export default {
             listLoading: false,
             total: 0,
             currentPage: 1,
+            sortable: null,
             pageSize: 10,
             form: {
                 name: ''
-            }
+            },
+            newMembers: []
         }
     },
     created() {
@@ -84,11 +88,16 @@ export default {
             this.listLoading = true
             getDeptMembers(params).then(resp => {
                 this.rawMembers = resp.data
-                console.log(resp.data)
+ 
                 this.deptMembers = this.rawMembers.map((value, key) => {
                     return { id: key, name: value }
                 })
+                console.log(this.deptMembers)
                 this.listLoading = false
+                this.newMembers = this.rawMembers.slice()
+                this.$nextTick(() => {
+                    this.setSort()
+                })
             })
         },
         setMembers() {
@@ -97,7 +106,7 @@ export default {
             const dept = this.currentDept
             this.updateMembers(dept, members)
         },
-        updateMembers(dept, members){
+        updateMembers(dept, members) {
             setDeptMembers(dept, members).then(resp => {
                 if (resp.status == 200) {
                     this.$notify({
@@ -118,6 +127,24 @@ export default {
         getAllDepts() {
             getAllDepts().then(resp => {
                 this.options = resp.data.flat()
+            })
+        },
+        setSort() {
+            const el = this.$refs.dragTable.$el.querySelectorAll('.el-table__body-wrapper > table > tbody')[0]
+            this.sortable = Sortable.create(el, {
+                ghostClass: 'sortable-ghost', // Class name for the drop placeholder,
+                setData: function (dataTransfer) {
+                    // to avoid Firefox bug
+                    // Detail see : https://github.com/RubaXa/Sortable/issues/1012
+                    dataTransfer.setData('Text', '')
+                },
+                onEnd: evt => {
+                    const tempIndex = this.newMembers.splice(evt.oldIndex, 1)[0]
+                    this.newMembers.splice(evt.newIndex, 0, tempIndex)
+                    const dept = this.currentDept
+                    console.log(tempIndex, this.newMembers)
+                    this.updateMembers(dept, this.newMembers)
+                }
             })
         },
         handleDeptChange() {
@@ -149,6 +176,14 @@ export default {
     },
 }
 </script>
+
+<style>
+.sortable-ghost {
+    opacity: .8;
+    color: #fff !important;
+    background: #42b983 !important;
+}
+</style>
 
 <style lang="scss" scoped>
 aside {
