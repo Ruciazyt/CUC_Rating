@@ -24,6 +24,18 @@
           @updateScore='updateScore' />
       </div>
     </div>
+    <div style="margin-left:2%" v-if="state.type === '2'">
+      <div v-for="(item, index) in rateTargets" v-show="index == state.targetId" :key="item.id">
+        <div v-if="(index < deptsNumber.techDeptLength)">
+          <TechForm :rateItem="item" :formInfo="formInfo" :ref="setRef" :deptType="state.type"
+            @updateScore='updateScore' />
+        </div>
+        <div v-else>
+          <PublicForm :rateItem="item" :formInfo="formInfo" :ref="setRef" :deptType="state.type"
+            @updateScore='updateScore' />
+        </div>
+      </div>
+    </div>
     <div class="controlBtn">
       <van-button type="success" size="small" @click="handlePreClick()" v-if="state.targetId > 0" class="preBtn">上一个
       </van-button>
@@ -50,7 +62,7 @@ import FormItem from "./components/FormItem.vue";
 import TechForm from "./components/TechForm.vue";
 import PublicForm from "./components/PublicForm.vue";
 import { useRouter, useRoute } from "vue-router";
-import { getAllTarget } from "@/apis/reportForm.js";
+import { getAllTarget, getDepts } from "@/apis/reportForm.js";
 export default {
   components: {
     FormItem,
@@ -76,6 +88,7 @@ export default {
     const route = useRoute();
     const rateTargets = ref([]);
     const state = reactive({ type: null, targetId: 0, rateTargetsLength: 0 })
+    const deptsNumber = reactive({ techDeptLength: 0, publicDeptLength: 0 })
     const refArr = [];
     let formInfo = {};
     const setRef = (el) => {
@@ -96,17 +109,28 @@ export default {
         formInfo = condition;
       }
     };
+    const getAllDepts = async () => {
+      getDepts().then(resp => {
+        const data = resp.data
+        deptsNumber.techDeptLength = data[0].length
+        deptsNumber.publicDeptLength = data[1].length
+      })
+    }
     const getTargets = async () => {
       if (JSON.stringify(formInfo) === "{}") {
         // 获取初始的token和string
         getFirstCondition();
       }
+      await getAllDepts()
       getAllTarget(formInfo).then((resp) => {
-        rateTargets.value = resp.data.progress;
+        const data = resp.data
+        rateTargets.value = data.progress;
         state.rateTargetsLength = rateTargets.value.length
-        state.type = resp.data.type[1]
-        // await nextTick()
-        console.log(route.query.id)
+        if(data.type.length > 1){
+          state.type = data.type[1]
+        }else{
+          state.type = data.type
+        }
         if (route.query && route.query.id) {
           state.targetId = route.query.id
         }
@@ -193,6 +217,7 @@ export default {
       rateTargets,
       formInfo,
       state,
+      deptsNumber,
       setRef,
       handlePreClick,
       handleNextClick,

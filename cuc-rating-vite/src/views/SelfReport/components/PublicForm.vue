@@ -49,8 +49,7 @@ export default {
     props: {
         rateItem: Object,
         formInfo: Object,
-        deptType: String,
-        targets: Array
+        deptType: String
     },
     emits: ['updateScore'],
     setup(props, { emit }) {
@@ -59,7 +58,7 @@ export default {
             { id: props.rateItem.id, label: "年度贡献评分", value: 1, score: props.rateItem.score[1] },
         ]
         const members = Object.keys(props.rateItem.members).map((key) => {
-            return { id: key, label: key, score: props.rateItem.members[key], targetType: 1 }
+            return { id: props.rateItem.id, label: key, score: props.rateItem.members[key], targetType: 1 }
         })
         const updateScore = () => {
             emit('updateScore')

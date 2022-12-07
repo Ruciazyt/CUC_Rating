@@ -14,3 +14,8 @@ export function rate(params) {
 export function rateMember(params) {
     return postRequest('/rate_member', params)
 }
+
+// 获取部门信息
+export function getDepts(){
+    return getRequest('/depts')
+}

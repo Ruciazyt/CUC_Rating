@@ -1,15 +1,14 @@
 <template>
   <el-dialog title="创建问卷" :visible.sync="dialogVisible">
-    <el-form
-      :label-position="labelPosition"
-      label-width="160px"
-      :model="formInfo"
-    >
+    <el-form :label-position="labelPosition" label-width="160px" :model="formInfo">
       <el-form-item label="线上打分团每组数量">
         <el-input v-model="formInfo.online_num"></el-input>
       </el-form-item>
       <el-form-item label="评委组每组数量">
         <el-input v-model="formInfo.offline_num"></el-input>
+      </el-form-item>
+      <el-form-item label="校领导数量">
+        <el-input v-model="formInfo.leader_num"></el-input>
       </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="onSubmit">立即创建</el-button>
@@ -29,6 +28,7 @@ export default {
       formInfo: {
         online_num: 4,
         offline_num: 3,
+        leader_num: 0
       },
       dialogVisible: false,
     };
@@ -59,4 +59,5 @@ export default {
 </script>
 
 <style>
+
 </style>

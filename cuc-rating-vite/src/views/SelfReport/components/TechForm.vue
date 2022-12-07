@@ -2,15 +2,18 @@
     <van-row justify="space-between" style="margin-bottom: 1%">
         <span style="font-weight: bold">{{ rateItem.name }}</span>
     </van-row>
-    <FormItem v-for="item in scoreItemList" :key="item.id + item.value.toString()" :rateItem="item" :formInfo="formInfo"
-        @updateScore="updateScore">
+    <FormItem v-for="(item, index) in scoreItemList" :key="item.id + item.value.toString()" :rateItem="item"
+        :formInfo="formInfo" @updateScore="updateScore">
     </FormItem>
-    <van-row justify="space-between" style="margin-bottom: 1%">
-        <van-col span="8"><span style="font-weight: bold">部门成员打分</span></van-col>
-    </van-row>
-    <FormItem v-for="item in members" :key="item.label" :rateItem="item" :formInfo="formInfo"
-        :targetType="item.targetType" @updateScore="updateScore">
-    </FormItem>
+    <van-divider :style="{ color: '#1989fa', borderColor: '#1989fa' }" />
+    <div style="background:#f7f8fa">
+        <van-row justify="space-between" style="margin-bottom: 1%">
+            <van-col span="8"><span style="font-weight: bold">部门成员打分</span></van-col>
+        </van-row>
+        <FormItem v-for="item in members" :key="item.id" :rateItem="item" :formInfo="formInfo"
+            :targetType="item.targetType" @updateScore="updateScore">
+        </FormItem>
+    </div>
 </template>
   
 <script>
