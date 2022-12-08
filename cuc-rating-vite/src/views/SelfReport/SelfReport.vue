@@ -4,7 +4,7 @@
     <van-row align="center" justify="center" style="margin-top: 16px">
       <van-col span="16">
         <span style="font-size: 16px; font-weight: bold">
-          XXXX年机关职能部门、直（附）属单位考核会打分表
+          2022年度考核
         </span>
       </van-col>
       <van-col span="4" offset="3">
@@ -37,10 +37,11 @@
       </div>
     </div>
     <div class="controlBtn">
-      <van-button type="success" size="small" @click="handlePreClick()" v-if="state.targetId > 0" class="preBtn">上一个
-      </van-button>
+      <van-button type="success" size="small" @click="handlePreClick()" v-if="state.targetId > 0"
+        class="preBtn">上一个</van-button>
       <van-button type="success" size="small" @click="handleNextClick()"
         v-if="state.targetId < state.rateTargetsLength - 1" class="nextBtn">下一个</van-button>
+      <van-button type="success" size="small" @click="handleSubmit()" v-else class="nextBtn">提交</van-button>
     </div>
   </van-config-provider>
 </template>
@@ -56,19 +57,21 @@ import {
   Divider,
   Icon,
   Notify,
+  Dialog,
 } from "vant";
 import { ref, reactive, nextTick, onMounted } from "vue";
 import FormItem from "./components/FormItem.vue";
 import TechForm from "./components/TechForm.vue";
 import PublicForm from "./components/PublicForm.vue";
 import { useRouter, useRoute } from "vue-router";
-import { getAllTarget, getDepts } from "@/apis/reportForm.js";
+import { getAllTarget, getDepts, getQuestionnaireStatus, updateQuestionnaireStatus } from "@/apis/reportForm.js";
 export default {
   components: {
     FormItem,
     TechForm,
     PublicForm,
     [Button.name]: Button,
+    [Dialog.Component.name]: Dialog.Component,
     [NavBar.name]: NavBar,
     [Cell.name]: Cell,
     [ConfigProvider.name]: ConfigProvider,
@@ -116,24 +119,37 @@ export default {
         deptsNumber.publicDeptLength = data[1].length
       })
     }
+
+    const checkeDeptStatus = async (condition) => {
+      getQuestionnaireStatus(condition).then(resp => {
+        if (resp.data === 1) {
+          router.push({
+            path: "/hints",
+          });
+        }
+      })
+    }
+
     const getTargets = async () => {
       if (JSON.stringify(formInfo) === "{}") {
         // 获取初始的token和string
         getFirstCondition();
+        if (route.query && route.query.id) {
+          state.targetId = route.query.id
+        }
       }
+      await checkeDeptStatus(formInfo)
       await getAllDepts()
       getAllTarget(formInfo).then((resp) => {
         const data = resp.data
         rateTargets.value = data.progress;
         state.rateTargetsLength = rateTargets.value.length
-        if(data.type.length > 1){
+        if (data.type.length > 1) {
           state.type = data.type[1]
-        }else{
+        } else {
           state.type = data.type
         }
-        if (route.query && route.query.id) {
-          state.targetId = route.query.id
-        }
+
         console.log(state.targetId)
         // nextTick(() => {
         //   jumpToId();
@@ -212,6 +228,42 @@ export default {
       return scoreList.includes(0) || memberFlag
     }
 
+    const findTargetsNotScored = () => {
+      const deptList = rateTargets.value
+      const unscoredDeptName = []
+      deptList.forEach(dept => {
+        const deptScore = dept.score
+        const memberScore = dept.members
+        let memberFlag = false
+        Object.keys(memberScore).forEach(key => {
+          if (memberScore[key] === 0) {
+            memberFlag = true
+          }
+        })
+        if ((deptScore.indexOf(0) !== -1) || (memberFlag === true)) {
+          unscoredDeptName.push(dept.name)
+        }
+      })
+      let res = "未完成对以下单位打分:\n" + unscoredDeptName.join('\n')
+      return res
+    }
+
+    const handleSubmit = () => {
+      const condition = formInfo
+      condition.status = 1
+      updateQuestionnaireStatus(condition).then(res => {
+        if (res.data === 0) {
+          let msg = findTargetsNotScored()
+          Dialog({ message: msg });
+        } else {
+          Dialog({ message: '完成打分' });
+          router.push({
+            path: "/hints",
+          });
+        }
+      })
+    }
+
     return {
       themeVars,
       rateTargets,
@@ -222,7 +274,8 @@ export default {
       handlePreClick,
       handleNextClick,
       totalScoreClick,
-      updateScore
+      updateScore,
+      handleSubmit
     };
   },
 };
@@ -231,6 +284,8 @@ export default {
 <style scoped>
 .controlBtn {
   width: 100%;
+  height: 100%;
+  position: relative;
 }
 
 .preBtn {

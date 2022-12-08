@@ -19,3 +19,12 @@ export function rateMember(params) {
 export function getDepts(){
     return getRequest('/depts')
 }
+
+// 获取问卷是否完成打分
+export function getQuestionnaireStatus(){
+    return getRequest('/questionnaire_status')
+}
+
+export function updateQuestionnaireStatus(params) {
+    return postRequest('/questionnaire_status', params)
+}

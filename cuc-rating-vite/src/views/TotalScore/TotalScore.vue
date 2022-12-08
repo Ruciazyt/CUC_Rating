@@ -2,7 +2,7 @@
   <div>
     <div>
       <van-nav-bar
-        title="总分"
+        title="打分情况"
         left-text="返回"
         left-arrow
         @click-left="onClickLeft"

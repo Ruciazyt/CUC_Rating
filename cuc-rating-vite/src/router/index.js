@@ -15,6 +15,12 @@ const routes = [
       title: "总分",
       component: () => import("@/views/TotalScore/TotalScore.vue"),
     },
+    {
+      path: "/hints",
+      name: "hint",
+      title: "提示",
+      component: () => import("@/views/HintsPage/index.vue"),
+    },
   ];
   
 // 配置router对象
