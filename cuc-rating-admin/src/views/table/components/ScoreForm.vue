@@ -1,10 +1,10 @@
 <template>
   <el-dialog title="创建问卷" :visible.sync="dialogVisible">
     <el-form :label-position="labelPosition" label-width="160px" :model="formInfo">
-      <el-form-item label="线上打分团每组数量">
+      <el-form-item label="考核组数量">
         <el-input v-model="formInfo.online_num"></el-input>
       </el-form-item>
-      <el-form-item label="评委组每组数量">
+      <el-form-item label="学校评委团数量">
         <el-input v-model="formInfo.offline_num"></el-input>
       </el-form-item>
       <el-form-item label="校领导数量">
