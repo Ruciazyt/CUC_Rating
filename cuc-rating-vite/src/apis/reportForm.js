@@ -21,8 +21,8 @@ export function getDepts(){
 }
 
 // 获取问卷是否完成打分
-export function getQuestionnaireStatus(){
-    return getRequest('/questionnaire_status')
+export function getQuestionnaireStatus(params){
+    return getRequest('/questionnaire_status',params)
 }
 
 export function updateQuestionnaireStatus(params) {
