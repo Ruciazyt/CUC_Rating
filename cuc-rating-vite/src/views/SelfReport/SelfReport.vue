@@ -7,8 +7,8 @@
           2022年度考核
         </span>
       </van-col>
-      <van-col span="4" offset="3">
-        <van-button type="success" @click="totalScoreClick()" style="font-weight:bold;width: 60px;">总分</van-button>
+      <van-col span="6" offset="0">
+        <van-button type="success" @click="totalScoreClick()" style="font-weight:bold;width: 100%;">打分情况</van-button>
       </van-col>
     </van-row>
     <van-divider :style="{ color: '#1989fa', borderColor: '#1989fa' }" />
@@ -285,16 +285,17 @@ export default {
 .controlBtn {
   width: 100%;
   height: 100%;
-  position: relative;
+  display: flex;
+  justify-content: space-around;
+  margin-top: 2%;
+  margin-bottom: 2%;
 }
 
 .preBtn {
-  position: absolute;
-  left: 20px
+  flex-basis: 100px;
 }
 
 .nextBtn {
-  position: absolute;
-  right: 20px
+  flex-basis: 100px;
 }
 </style>

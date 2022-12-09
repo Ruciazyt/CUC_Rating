@@ -7,14 +7,25 @@
           :min="valueRange.min" :max="valueRange.max" />
       </div>
     </van-row>
-    <van-radio-group v-model="checked" direction="horizontal" @change="handleCheckedChange" icon-size="24px"
-      class="group">
-      <van-radio name="1" class="radioItem">优秀</van-radio>
-      <van-radio name="2" class="radioItem">良好</van-radio>
-      <van-radio name="3" class="radioItem">合格</van-radio>
-      <van-radio name="4" class="radioItem">基本合格</van-radio>
-      <van-radio name="5" class="radioItem">不合格</van-radio>
-    </van-radio-group>
+    <div v-if="(targetType !== 1)">
+      <van-radio-group v-model="checked" direction="horizontal" @change="handleCheckedChange" icon-size="24px"
+        class="group">
+        <van-radio name="1" class="radioItem">优秀</van-radio>
+        <van-radio name="2" class="radioItem">良好</van-radio>
+        <van-radio name="3" class="radioItem">合格</van-radio>
+        <van-radio name="4" class="radioItem">基本合格</van-radio>
+        <van-radio name="5" class="radioItem">不合格</van-radio>
+      </van-radio-group>
+    </div>
+    <div v-else>
+      <van-radio-group v-model="checked" direction="horizontal" @change="handleCheckedChange" icon-size="24px"
+        class="group">
+        <van-radio name="1" class="radioItem">优秀</van-radio>
+        <van-radio name="2" class="radioItem">称职</van-radio>
+        <van-radio name="3" class="radioItem">基本称职</van-radio>
+        <van-radio name="4" class="radioItem">不称职</van-radio>
+      </van-radio-group>
+    </div>
   </div>
 </template>
 
@@ -67,29 +78,51 @@ export default {
     const scoreShow = reactive({
       isShow: props.rateItem.score === -1 ? false : true,
     })
+
     const handleCheckedChange = (checked) => {
       scoreShow.isShow = true;
-      switch (checked) {
-        case "1":
-          valueRange.currentValue = 90;
-          setRange(90, 100);
-          break;
-        case "2":
-          valueRange.currentValue = 80;
-          setRange(80, 89);
-          break;
-        case "3":
-          valueRange.currentValue = 70;
-          setRange(70, 79);
-          break;
-        case "4":
-          valueRange.currentValue = 60;
-          setRange(60, 69);
-          break;
-        case "5":
-          valueRange.currentValue = 50;
-          setRange(50, 59);
-          break;
+      if (props.targetType !== 1) {
+        switch (checked) {
+          case "1":
+            valueRange.currentValue = 90;
+            setRange(90, 100);
+            break;
+          case "2":
+            valueRange.currentValue = 80;
+            setRange(80, 89);
+            break;
+          case "3":
+            valueRange.currentValue = 70;
+            setRange(70, 79);
+            break;
+          case "4":
+            valueRange.currentValue = 60;
+            setRange(60, 69);
+            break;
+          case "5":
+            valueRange.currentValue = 50;
+            setRange(50, 59);
+            break;
+        }
+      } else {
+        switch (checked) {
+          case "1":
+            valueRange.currentValue = 90;
+            setRange(90, 100);
+            break;
+          case "2":
+            valueRange.currentValue = 80;
+            setRange(70, 89);
+            break;
+          case "3":
+            valueRange.currentValue = 60;
+            setRange(60, 69);
+            break;
+          case "4":
+            valueRange.currentValue = 50;
+            setRange(50, 59);
+            break;
+        }
       }
     };
 
@@ -100,26 +133,47 @@ export default {
 
     const initChecked = () => {
       let val = valueRange.currentValue
-      if (val >= 90) {
-        checked.value = "1";
-        setRange(90, 100);
-      } else if (val >= 80) {
-        checked.value = "2";
-        setRange(80, 89);
-      } else if (val >= 70) {
-        checked.value = "3";
-        setRange(70, 79);
-      } else if (val >= 60) {
-        checked.value = "4";
-        setRange(60, 69);
-      } else if (val > 0) {
-        checked.value = "5";
-        setRange(50, 59);
-      } else {
-        // 没打分
-        checked.value = ""
-        // setRange(-1, -1);
+      if (props.targetType !== 1) {
+        if (val >= 90) {
+          checked.value = "1";
+          setRange(90, 100);
+        } else if (val >= 80) {
+          checked.value = "2";
+          setRange(80, 89);
+        } else if (val >= 70) {
+          checked.value = "3";
+          setRange(70, 79);
+        } else if (val >= 60) {
+          checked.value = "4";
+          setRange(60, 69);
+        } else if (val > 0) {
+          checked.value = "5";
+          setRange(50, 59);
+        } else {
+          // 没打分
+          checked.value = ""
+          // setRange(-1, -1);
+        }
+      }else{
+        if (val >= 90) {
+          checked.value = "1";
+          setRange(90, 100);
+        } else if (val >= 70) {
+          checked.value = "2";
+          setRange(70, 79);
+        } else if (val >= 60) {
+          checked.value = "3";
+          setRange(60, 69);
+        } else if (val > 0) {
+          checked.value = "4";
+          setRange(50, 59);
+        } else {
+          // 没打分
+          checked.value = ""
+          // setRange(-1, -1);
+        }
       }
+
     };
     // 根据得分初始化 选项按钮
     initChecked();
@@ -188,10 +242,11 @@ export default {
   height: 80px;
 }
 
-.radioItem{
+.radioItem {
   margin-left: 5%;
 }
-.scoreCenter{
+
+.scoreCenter {
   margin-left: 5%;
   display: flex;
   justify-content: center;
