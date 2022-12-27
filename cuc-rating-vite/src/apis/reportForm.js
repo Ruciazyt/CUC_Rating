@@ -28,3 +28,7 @@ export function getQuestionnaireStatus(params){
 export function updateQuestionnaireStatus(params) {
     return postRequest('/questionnaire_status', params)
 }
+
+export function getUrl(params){
+    return getRequest('/work_report', params)
+}

@@ -210,8 +210,14 @@ export default {
             Notify({ type: "warning", message: "当前部门未完成评分" });
             return
           }
-          if (state.targetId < state.rateTargetsLength - 1)
+          if (state.targetId < state.rateTargetsLength - 1) {
             state.targetId++
+            window.scrollTo({
+              left: 0,
+              top: 0,
+              behavior: 'smooth'
+            })
+          }
         })
       }, 1500)
     }
@@ -256,10 +262,12 @@ export default {
           let msg = findTargetsNotScored()
           Dialog({ message: msg });
         } else {
-          Dialog({ message: '完成打分' });
-          router.push({
-            path: "/hints",
+          Dialog({ message: '提交后不可修改，确认提交?' }).then(() => {
+            router.push({
+              path: "/hints",
+            });
           });
+
         }
       })
     }

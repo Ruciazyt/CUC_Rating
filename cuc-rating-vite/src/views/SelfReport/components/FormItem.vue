@@ -6,6 +6,10 @@
         <van-stepper v-show="scoreShow.isShow" v-model="valueRange.currentValue" @change="handleStepperChange"
           :min="valueRange.min" :max="valueRange.max" />
       </div>
+      <div v-if="(targetType === 1)" class="report">
+        <van-button plain type="success" size="small" @click="checkReport(rateItem.label)">述职报告</van-button>
+        <!-- <a target="_blank" href="/test.pdf">预览pdf</a> -->
+      </div>
     </van-row>
     <div v-if="(targetType !== 1)">
       <van-radio-group v-model="checked" direction="horizontal" @change="handleCheckedChange" icon-size="24px"
@@ -26,11 +30,15 @@
         <van-radio name="4" class="radioItem">不称职</van-radio>
       </van-radio-group>
     </div>
+    <!-- <van-dialog v-model:show="show" title="标题" show-cancel-button>
+      <iframe src="/test.pdf" frameborder="0" style="width: 100vw; height: 80vh"></iframe>
+    </van-dialog> -->
   </div>
 </template>
 
 <script>
 import {
+  Button,
   Form,
   Field,
   CellGroup,
@@ -41,12 +49,14 @@ import {
   Stepper,
   Divider,
   Notify,
+  Dialog
 } from "vant";
 import { reactive, ref, provide } from "vue";
-import { rate, rateMember } from "@/apis/reportForm";
+import { rate, rateMember, getUrl } from "@/apis/reportForm";
 export default {
   name: "FormItem",
   components: {
+    [Button.name]: Button,
     [Field.name]: Field,
     [Form.name]: Form,
     [CellGroup.name]: CellGroup,
@@ -57,11 +67,14 @@ export default {
     [Stepper.name]: Stepper,
     [Divider.name]: Divider,
     [Notify.Component.name]: Notify.Component,
+    [Dialog.Component.name]: Dialog.Component,
+
   },
   props: {
     rateItem: Object,
     formInfo: Object,
     deptType: String,
+    deptName: String,
     targetType: {
       default: 0,
       type: Number
@@ -69,6 +82,7 @@ export default {
   },
   emits: ['updateScore'],
   setup(props, { emit }) {
+    const show = ref(false)
     const checked = ref("1");
     const valueRange = reactive({
       currentValue: props.rateItem.score === -1 ? -1 : props.rateItem.score,
@@ -154,7 +168,7 @@ export default {
           checked.value = ""
           // setRange(-1, -1);
         }
-      }else{
+      } else {
         if (val >= 90) {
           checked.value = "1";
           setRange(90, 100);
@@ -231,7 +245,23 @@ export default {
       stepperChange();
     };
 
-    return { checked, valueRange, scoreShow, handleCheckedChange, handleStepperChange };
+    const checkReport = (name) => {
+      // show.value = true
+      console.log(props.deptName)
+      const condition = {
+        dept:props.deptName,
+        member:name
+      }
+      getUrl(condition).then(resp=>{
+        let url = resp.data
+        // alert(url)
+        window.location = url
+        // window.open(url,'_blank')
+      })
+    }
+
+
+    return { show, checked, valueRange, scoreShow, handleCheckedChange, handleStepperChange, checkReport };
   },
 };
 </script>
@@ -247,6 +277,13 @@ export default {
 }
 
 .scoreCenter {
+  margin-left: 5%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.report {
   margin-left: 5%;
   display: flex;
   justify-content: center;

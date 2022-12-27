@@ -1,7 +1,7 @@
 <template>
   <div>
     <div>
-      <van-nav-bar title="打分情况" left-text="返回至第一项" left-arrow @click-left="onClickLeft" />
+      <van-nav-bar title="打分情况" left-text="开始打分" left-arrow @click-left="onClickLeft" />
     </div>
     <ul>
       <li v-for="item in scoreList" :key="item.id" class="scoreItem" @click="onClickJumpToId(item.id)">
@@ -12,7 +12,7 @@
           </p>
           <p class="tips">
             <span>部门评分：{{ item.deptScoreTip }}</span>
-            <span>领导班子成员打分：{{ item.leaderScoreTip }}</span>
+            <span v-show="query_type.value === 0">领导班子成员打分：{{ item.leaderScoreTip }}</span>
           </p>
         </div>
       </li>
@@ -46,6 +46,7 @@ export default {
     const unscoredDepts = ref([])
     const loading = ref(false);
     const finished = ref(false);
+    const query_type = ref(-1)
 
     const findTargetsNotScored = () => {
       const deptList = state.scoreList
@@ -81,6 +82,8 @@ export default {
         };
         getAllTarget(condition).then((resp) => {
           const data = resp.data.progress
+          const type = parseInt(resp.data.type[0])
+          query_type.value = type
           state.scoreList = data.map(item => {
             if (item.score.indexOf(0) !== -1) {
               item.deptScoreTip = "未完成"
@@ -130,6 +133,7 @@ export default {
       unscoredDepts,
       loading,
       finished,
+      query_type,
       ...toRefs(state),
       onClickLeft,
       onClickJumpToId,
