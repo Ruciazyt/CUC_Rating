@@ -26,12 +26,13 @@
     </div>
     <div style="margin-left:2%" v-if="state.type === '2'">
       <div v-for="(item, index) in rateTargets" v-show="index == state.targetId" :key="item.id">
-        <div v-if="(index < deptsNumber.techDeptLength)">
-          <TechForm :rateItem="item" :formInfo="formInfo" :ref="setRef" :deptType="state.type"
+        <div v-if="item.score.length === 2">
+          <PublicForm :rateItem="item" :formInfo="formInfo" :ref="setRef" :deptType="state.type"
             @updateScore='updateScore' />
+
         </div>
         <div v-else>
-          <PublicForm :rateItem="item" :formInfo="formInfo" :ref="setRef" :deptType="state.type"
+          <TechForm :rateItem="item" :formInfo="formInfo" :ref="setRef" :deptType="state.type"
             @updateScore='updateScore' />
         </div>
       </div>
@@ -41,7 +42,7 @@
         class="preBtn">上一个</van-button>
       <van-button type="success" size="small" @click="handleNextClick()"
         v-if="state.targetId < state.rateTargetsLength - 1" class="nextBtn">下一个</van-button>
-      <van-button type="success" size="small" @click="handleSubmit()" v-else class="nextBtn">提交</van-button>
+      <!-- <van-button type="success" size="small" @click="handleSubmit()" v-else class="nextBtn">提交</van-button> -->
     </div>
   </van-config-provider>
 </template>
@@ -219,19 +220,31 @@ export default {
             })
           }
         })
-      }, 1500)
+      }, 2000)
     }
 
     const nextBtnDisable = async () => {
       const scoreList = rateTargets.value[state.targetId].score || []
       const memberScoreList = rateTargets.value[state.targetId].members || {}
       let memberFlag = false
+      let logFlag1 = false
+      let logFlag2 = false
       Object.keys(memberScoreList).forEach(key => {
-        if (memberScoreList[key] === 0) {
+        if (memberScoreList[key] < 50) {
           memberFlag = true
+          logFlag1 = true
         }
       })
-      return scoreList.includes(0) || memberFlag
+      scoreList.forEach(score => {
+        if (score < 50) {
+          memberFlag = true
+          logFlag2 = true
+        }
+      })
+      if (logFlag1) console.log("人员问题")
+      if (logFlag2) console.log("部门评分问题")
+      // return scoreList.includes(0) || memberFlag
+      return memberFlag
     }
 
     const findTargetsNotScored = () => {
@@ -257,18 +270,19 @@ export default {
     const handleSubmit = () => {
       const condition = formInfo
       condition.status = 1
-      updateQuestionnaireStatus(condition).then(res => {
-        if (res.data === 0) {
-          let msg = findTargetsNotScored()
-          Dialog({ message: msg });
-        } else {
-          Dialog({ message: '提交后不可修改，确认提交?' }).then(() => {
+      Dialog.confirm({ message: '提交后不可修改，确认提交?' }).then(() => {
+        updateQuestionnaireStatus(condition).then(res => {
+          if (res.data === 0) {
+            let msg = findTargetsNotScored()
+            Dialog({ message: msg });
+          } else {
             router.push({
               path: "/hints",
             });
-          });
+          }
+        })
+      }).catch(()=>{
 
-        }
       })
     }
 

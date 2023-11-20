@@ -174,7 +174,7 @@ export default {
           setRange(90, 100);
         } else if (val >= 70) {
           checked.value = "2";
-          setRange(70, 79);
+          setRange(70, 89);
         } else if (val >= 60) {
           checked.value = "3";
           setRange(60, 69);

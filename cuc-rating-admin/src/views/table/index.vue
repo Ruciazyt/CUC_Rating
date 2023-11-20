@@ -88,7 +88,8 @@ export default {
       }
       const fileName = timeStr + "导出结果"
       exportRes(condition).then(response => {
-        let blob = new Blob([response.data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' })
+        // let blob = new Blob([response.data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' })
+        let blob = new Blob([response.data], { type: 'application/zip' })
         // 非IE下载
         let a = document.createElement('a')
         a.style.display = 'none'

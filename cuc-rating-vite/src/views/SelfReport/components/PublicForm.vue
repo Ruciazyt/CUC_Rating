@@ -8,7 +8,7 @@
         </FormItem>
     </div>
     <van-divider :style="{ color: '#1989fa', borderColor: '#1989fa' }" />
-    <div style="background:#f7f8fa">
+    <div style="background:#f7f8fa" v-show="members.length > 0">
         <van-row justify="space-between" style="margin-bottom: 1%">
             <van-col span="8"><span style="font-weight: bold">部门领导干部</span></van-col>
         </van-row>

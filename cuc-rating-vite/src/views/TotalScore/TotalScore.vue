@@ -12,30 +12,37 @@
           </p>
           <p class="tips">
             <span>部门评分：{{ item.deptScoreTip }}</span>
-            <span v-show="query_type.value === 0">领导班子成员打分：{{ item.leaderScoreTip }}</span>
+            <span v-show="query_type !== 0">领导班子成员打分：{{ item.leaderScoreTip }}</span>
           </p>
         </div>
       </li>
     </ul>
     <div style="margin:1%">
-      <p>未完成对以下部门打分:</p>
-      <van-list v-model:loading="loading" :finished="finished" finished-text="没有更多了">
-        <van-cell v-for="item in unscoredDepts" :key="item.id" :title="item.name" @click="onClickJumpToId(item.id)" />
-      </van-list>
+      <div v-if="unscoredDepts.length > 0">
+        <p>未完成对以下部门打分:</p>
+        <van-list v-model:loading="loading" :finished="finished" finished-text="没有更多了">
+          <van-cell v-for="item in unscoredDepts" :key="item.id" :title="item.name" @click="onClickJumpToId(item.id)" />
+        </van-list>
+      </div>
+      <div v-else class="submitBtn">
+        <van-button type="success" @click="handleSubmit()" class="nextBtn">提交</van-button>
+      </div>
     </div>
   </div>
 </template>
 
 <script>
-import { NavBar, List, Cell } from "vant";
+import { NavBar, List, Cell, Button,  Dialog } from "vant";
 import { ref, reactive, toRefs } from "vue";
 import { useRouter, useRoute } from "vue-router";
-import { getAllTarget } from "@/apis/reportForm.js";
+import { getAllTarget, updateQuestionnaireStatus } from "@/apis/reportForm.js";
 export default {
   components: {
     [NavBar.name]: NavBar,
+    [Button.name]: Button,
     [List.name]: List,
     [Cell.name]: Cell,
+    [Dialog.Component.name]: Dialog.Component,
   },
   setup() {
     const state = reactive({
@@ -129,6 +136,22 @@ export default {
         },
       });
     };
+
+    const handleSubmit = () => {
+      const condition = {
+        time_string: route.query.time_string,
+        token: route.query.token,
+        status: 1
+      }
+      Dialog.confirm({ message: '提交后不可修改，确认提交?' }).then(() => {
+        updateQuestionnaireStatus(condition).then(res => {
+          router.push({
+            path: "/hints",
+          });
+        })
+      });
+    }
+
     return {
       unscoredDepts,
       loading,
@@ -137,6 +160,7 @@ export default {
       ...toRefs(state),
       onClickLeft,
       onClickJumpToId,
+      handleSubmit
     };
   },
 };
@@ -173,7 +197,13 @@ ul {
 
 .tips {
   flex: 1.5;
-  display:flex;
+  display: flex;
   flex-direction: column;
+}
+
+.submitBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 </style>
