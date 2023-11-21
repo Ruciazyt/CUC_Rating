@@ -13,20 +13,29 @@ export default defineConfig({
     vue(),
     styleImport({
       resolves: [VantResolve()],
+      libs: [
+        {
+          libraryName: "vant",
+          esModule: true,
+          resolveStyle: (name) => {
+            return `../es/${name}/style`;
+          },
+        },
+      ],
     }),
   ],
-  build:{
-    target:'modules',
-    outDir:'dist',
-    assetsDir:'assets'
+  build: {
+    target: "modules",
+    outDir: "dist",
+    assetsDir: "assets",
   },
   server: {
     host: "0.0.0.0",
     proxy: {
-      ['/dev-api']: {
+      ["/dev-api"]: {
         target: "http://47.111.143.45:8000/",
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/dev-api/, '')
+        rewrite: (path) => path.replace(/^\/dev-api/, ""),
       },
     },
   },
